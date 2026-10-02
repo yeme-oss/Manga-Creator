@@ -1,0 +1,3341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangaCreator — AI Dark Fantasy Graphic Novella Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07080b;
+      --bg-card: rgba(15, 18, 26, 0.82);
+      --bg-surface: #11141e;
+      --bg-input: rgba(6, 8, 12, 0.88);
+      --border-subtle: rgba(212, 175, 55, 0.16);
+      --border-active: rgba(212, 175, 55, 0.55);
+      --gold-primary: #d4af37;
+      --gold-light: #f5e7b2;
+      --gold-dark: #8c6f1a;
+      --starlight-cyan: #72b9d5;
+      --starlight-glow: rgba(114, 185, 213, 0.3);
+      --crimson-accent: #c44545;
+      --text-main: #f0f2f7;
+      --text-muted: #8b92a3;
+      --text-dim: #5c6373;
+      --font-title: 'Cinzel', serif;
+      --font-ui: 'Outfit', sans-serif;
+      --font-story: 'Cormorant Garamond', Georgia, serif;
+      --radius: 10px;
+      --gallery-aspect-ratio: 3/4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(35, 48, 68, 0.38) 0%, transparent 65%),
+        radial-gradient(circle at 10% 85%, rgba(212, 175, 55, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 90% 75%, rgba(114, 185, 213, 0.06) 0%, transparent 45%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 68px;
+      background: rgba(7, 8, 11, 0.9);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--gold-primary), #3a2a0a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+      color: #000;
+      font-weight: 900;
+      font-family: var(--font-title);
+      font-size: 1.1rem;
+    }
+
+    .brand-title {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+    }
+
+    .brand-title span {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: var(--starlight-cyan);
+      border: 1px solid rgba(114, 185, 213, 0.3);
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+    }
+
+    /* API Key Top Bar Pill */
+    .api-key-pill {
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      padding: 4px 6px 4px 14px;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      max-width: 440px;
+      flex: 1;
+    }
+
+    .api-key-pill:focus-within {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.2);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+      flex-shrink: 0;
+    }
+
+    .api-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .api-input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-family: monospace;
+      outline: none;
+      width: 100%;
+    }
+
+    .btn-key-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .btn-key-toggle:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: rgba(212, 175, 55, 0.16);
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Manga Text Language Toggle */
+    .lang-toggle:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .lang-segs {
+      display: inline-flex;
+      gap: 2px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 5px;
+      padding: 2px;
+    }
+
+    .lang-seg {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+
+    .lang-seg.active {
+      background: var(--gold-primary);
+      color: #06080b;
+    }
+
+    /* Main Container Grid */
+    main {
+      flex: 1;
+      max-width: 1560px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem 2rem;
+      display: grid;
+      grid-template-columns: 480px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Panels */
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.35rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.85rem;
+    }
+
+    .panel-title {
+      font-family: var(--font-title);
+      font-size: 1.15rem;
+      letter-spacing: 0.15em;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-step-badge {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(114, 185, 213, 0.2));
+      border: 1px solid var(--border-subtle);
+      color: var(--starlight-cyan);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: var(--font-ui);
+      font-weight: 600;
+    }
+
+    /* Form Fields */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    label .hint {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    textarea, input[type="text"], input[type="number"], select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+      line-height: 1.5;
+    }
+
+    /* Sample Master Prompt Pills */
+    .sample-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.15rem;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .pill-btn:hover {
+      color: var(--gold-light);
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+    }
+
+    /* Primary Master Prompt CTA Button */
+    .btn-master-action {
+      background: linear-gradient(135deg, var(--gold-primary), #9a761e);
+      color: #06080b;
+      font-weight: 700;
+      font-family: var(--font-title);
+      letter-spacing: 0.12em;
+      border: none;
+      border-radius: 8px;
+      padding: 0.95rem 1.25rem;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 0.25rem;
+    }
+
+    .btn-master-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(212, 175, 55, 0.55);
+      color: #000;
+    }
+
+    /* Style Reference Image Box */
+    .style-box {
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .style-preview-header {
+      padding: 0.5rem 0.85rem;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+    }
+
+    .style-preview-container {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .style-preview-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .style-actions {
+      padding: 0.6rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .btn-small {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+    }
+
+    /* Secondary CTA */
+    .btn-secondary {
+      background: rgba(114, 185, 213, 0.12);
+      border: 1px solid var(--starlight-cyan);
+      color: var(--starlight-cyan);
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(114, 185, 213, 0.22);
+      box-shadow: 0 0 16px rgba(114, 185, 213, 0.3);
+    }
+
+    /* Spoiler-Free Toggle Banner */
+    .spoiler-toggle-card {
+      background: linear-gradient(90deg, rgba(196, 69, 69, 0.15), rgba(15, 18, 26, 0.6));
+      border: 1px solid rgba(196, 69, 69, 0.35);
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .spoiler-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .spoiler-icon {
+      font-size: 1.3rem;
+      color: var(--crimson-accent);
+    }
+
+    .spoiler-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .spoiler-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Switch Component */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #242938;
+      transition: .3s;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--crimson-accent);
+      border-color: var(--crimson-accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Story Bible Acts Editor */
+    .acts-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .act-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .act-card.spoiler-blurred .act-content {
+      filter: blur(9px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .spoiler-overlay {
+      display: none;
+      position: absolute;
+      inset: 48px 0 0 0;
+      background: rgba(7, 8, 11, 0.45);
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      backdrop-filter: blur(2px);
+      gap: 0.5rem;
+      border-top: 1px dashed rgba(196, 69, 69, 0.5);
+    }
+
+    .act-card.spoiler-blurred .spoiler-overlay {
+      display: flex;
+    }
+
+    .act-card.spoiler-revealed .act-content {
+      filter: none !important;
+      user-select: auto !important;
+      pointer-events: auto !important;
+    }
+    .act-card.spoiler-revealed .spoiler-overlay {
+      display: none !important;
+    }
+
+    .act-header {
+      padding: 0.85rem 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .act-title-tag {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      margin-right: 0.75rem;
+    }
+
+    .act-title-input {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: var(--gold-light);
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 0.92rem;
+      width: 100%;
+      padding: 3px 6px;
+      transition: all 0.2s;
+    }
+
+    .act-title-input:hover {
+      border-color: rgba(212, 175, 55, 0.3);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .act-title-input:focus {
+      border-color: var(--gold-primary);
+      background: rgba(0, 0, 0, 0.6);
+      outline: none;
+    }
+
+    .act-pages-range {
+      font-size: 0.75rem;
+      color: var(--starlight-cyan);
+      background: rgba(114, 185, 213, 0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .act-content {
+      padding: 1.25rem;
+      transition: filter 0.3s ease;
+    }
+
+    .act-content textarea {
+      min-height: 90px;
+      font-family: var(--font-story);
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+
+    /* Live Studio Pipeline & Gallery */
+    .pipeline-status-box {
+      background: rgba(114, 185, 213, 0.05);
+      border: 1px solid rgba(114, 185, 213, 0.25);
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #1c202d;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-primary), var(--starlight-cyan));
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 12px var(--starlight-cyan);
+    }
+
+    .pipeline-log-text {
+      font-size: 0.85rem;
+      color: var(--starlight-cyan);
+      font-family: monospace;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Gallery Grid */
+    .live-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #000;
+      aspect-ratio: var(--gallery-aspect-ratio, 3/4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold-primary);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-item-badge {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: var(--gold-light);
+      font-size: 0.75rem;
+      padding: 3px;
+      text-align: center;
+      font-family: var(--font-title);
+    }
+
+    /* Notification Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-active);
+      color: var(--gold-light);
+      padding: 0.85rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-icon">G</div>
+      <div class="brand-title">
+        MANGA CREATOR <span>AI GRAPHIC NOVELLA STUDIO</span>
+      </div>
+    </a>
+
+    <!-- Top API Key Bar for Easy Switching -->
+    <div class="api-key-pill" title="Gemini API Key. Loaded from environment and editable anytime.">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="api-label">Google Key:</span>
+      <input type="password" id="apiKeyInput" class="api-input" placeholder="AIzaSy...">
+      <button class="btn-key-toggle" id="btnToggleKey" type="button">Show</button>
+    </div>
+
+    <!-- LocalStorage Auto-Save Status Indicator -->
+    <div id="autosaveBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #4ade80; background: rgba(74, 222, 128, 0.08); border: 1px solid rgba(74, 222, 128, 0.25); padding: 5px 12px; border-radius: 20px; transition: all 0.3s ease;">
+      <span style="font-size: 0.7rem;">💾</span>
+      <span id="autosaveText">Local Storage Synced</span>
+    </div>
+
+    <!-- Quick Navigation Links -->
+    <div class="header-links">
+      <button class="nav-btn lang-toggle" id="btnMangaLang" type="button" title="Language of the generated manga text: dialogue, captions, sound effects and lettering. The interface stays in English. Click to switch." aria-label="Manga text language: English. Click to switch.">
+        🗨️ Manga Text
+        <span class="lang-segs"><span class="lang-seg active" data-lang="en">EN</span><span class="lang-seg" data-lang="fr">FR</span></span>
+      </button>
+      <a href="reader.html" class="nav-btn" target="_blank" title="Open the 50-Page Comic Reader">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        Open Reader
+      </a>
+      <button class="nav-btn" id="btnExportBible" type="button" title="Save Story Bible to Markdown">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Export Bible
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Studio Workspace -->
+  <main>
+
+    <!-- LEFT COLUMN: Master Story Concept & Orderly Controls -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>STORY FOUNDATION</span>
+        </div>
+        <span class="panel-step-badge">STEP 1</span>
+      </div>
+
+      <!-- 0. Manga Project & Dedicated Folder Selector -->
+      <div class="field-group" style="background: rgba(212, 175, 55, 0.05); padding: 1.1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <label style="margin: 0; font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 0.4rem;">
+            📁 Active Manga Project & Folder
+          </label>
+          <span class="act-pages-range" id="projectBadge" style="color: var(--starlight-cyan); border-color: rgba(114, 185, 213, 0.3);">Active Workspace</span>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <select id="projectSelect" style="flex: 1; padding: 7px 10px; font-size: 0.85rem;">
+            <option value="grimoire" selected>Grimoire (Dark Fantasy Novella — 50 Pages)</option>
+            <option value="new">+ [Create New Manga Project]</option>
+          </select>
+          <button class="btn-small" id="btnRefreshProjects" type="button" title="Refresh projects list" style="padding: 6px 10px;">🔄</button>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="projectTitleInput" placeholder="Manga Title (e.g. Shadows of Eldoria)" value="Grimoire" style="flex: 1; padding: 7px 10px; font-size: 0.85rem;">
+          <button class="btn-small" id="btnCreateProject" type="button" style="white-space: nowrap; padding: 6px 12px; background: rgba(212, 175, 55, 0.15); border-color: var(--gold-primary);">📁 Initialize Folder</button>
+        </div>
+
+        <div style="margin-top: 0.65rem; font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>Directory: <code id="projectFolderDisplay" style="color: var(--starlight-cyan);">/ (Root Grimoire)</code></div>
+          <div><span id="projRefsCount" style="color: var(--gold-light); font-weight: 600;">7</span> refs &bull; <span id="projPagesCount" style="color: var(--starlight-cyan); font-weight: 600;">50</span> pages</div>
+        </div>
+      </div>
+
+      <!-- 1. Master Story Concept -->
+      <div class="field-group">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.35rem;">
+          <label for="masterPrompt" style="margin: 0;">
+            Master Story Concept
+            <span class="hint">The primordial spark of your narrative</span>
+          </label>
+          <button class="btn-small" id="btnSanitizeCopyright" type="button" title="Strip official trademarks & replace with copyright-free original placeholders" style="padding: 5px 12px; font-size: 0.76rem; border-color: rgba(114, 185, 213, 0.4); color: var(--starlight-cyan); background: rgba(114, 185, 213, 0.08); display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s;">
+            <span>🛡️</span> Make Copyright-Free
+          </button>
+        </div>
+        <textarea id="masterPrompt" placeholder="Describe the soul of your story...">A very dark fantasy story called Grimoire. The main character is a sorrowful necromancer Lich named Malacor who lives in the lightless Depths Untold. It is an emotional tale where necromancy is not malice, but an ancient duty of memory to preserve those forgotten by the tyrannical Sun Church. When a fragile 9-year-old mortal child named Elara falls into the tomb clutching a dying lantern, the Lich chooses to shelter her rather than consume her warmth.</textarea>
+        
+        <!-- Preset Idea Pills -->
+        <div class="sample-pills">
+          <button class="pill-btn" type="button" onclick="loadPrompt('grimoire')">Grimoire (Lich & Stray)</button>
+          <button class="pill-btn" type="button" onclick="loadPrompt('cyberpunk')">Neon Necropolis</button>
+          <button class="pill-btn" type="button" onclick="loadPrompt('last_tree')">The Last Arbiter</button>
+        </div>
+      </div>
+
+      <!-- 2. Master Prompt Action Button (Placed IMMEDIATELY underneath concept) -->
+      <button class="btn-master-action" id="btnSynthesizeBible" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        ✨ Synthesize Concept & Feed 7 Emotional Resonances
+      </button>
+
+      <!-- 3. Emotional Impact Dropdown (Fed with 7 suggestions on click) -->
+      <div class="field-group">
+        <label for="emotionalImpact">
+          Emotional Impact <span style="color: var(--starlight-cyan);">(7 Thematic Suggestions)</span>
+          <span class="hint">Governs visual mood, lighting & dialogue depth</span>
+        </label>
+        <select id="emotionalImpact">
+          <!-- Dynamically populated with 7 tailored suggestions -->
+        </select>
+      </div>
+
+      
+      <!-- 4. Genre & Visual Art Style Selector -->
+      <div class="field-group">
+        <label for="genreStyleSelect">
+          Genre & Visual Art Style
+          <span class="hint">Governs character design, linework, and inking aesthetic</span>
+        </label>
+        <select id="genreStyleSelect">
+          <option value="whimsical_fantasy">✨ Whimsical Fantasy & Steampunk (Studio Ghibli / Toriyama — Expressive, warm, charming)</option>
+          <option value="dark_fantasy">⚔️ Dark Fantasy Grimdark (Kentaro Miura / Berserk — Stark crosshatching, deep shadows)</option>
+          <option value="shonen_adventure">🔥 High-Energy Shonen (Bold outlines, dynamic action panels, heroic expressions)</option>
+          <option value="cyberpunk_scifi">🚀 Cyberpunk / Sci-Fi (Moebius ligne-claire, intricate mechanics, neon glows)</option>
+          <option value="classic_manga">📖 Classic Japanese Manga (Clean monochrome screentone, expressive acting)</option>
+          <option value="custom">🎨 Freeform Story-Driven (Derived purely from story concept)</option>
+        </select>
+      </div>
+
+      <!-- 5. Aspect Ratio Selector -->
+      <div class="field-group">
+        <label for="aspectRatioSelect">
+          Image & Page Aspect Ratio
+          <span class="hint">Portrait (3:4), Webtoon (9:16), Cinematic (16:9), Square (1:1), Landscape (4:3)</span>
+        </label>
+        <select id="aspectRatioSelect">
+          <option value="3:4" selected>3:4 — Standard Manga / Graphic Novel (Portrait)</option>
+          <option value="9:16">9:16 — Vertical Webtoon / Mobile Scroll</option>
+          <option value="16:9">16:9 — Cinematic Widescreen / Double Spread</option>
+          <option value="1:1">1:1 — Square Format / Classic Panel</option>
+          <option value="4:3">4:3 — Classic Landscape Comic</option>
+        </select>
+      </div>
+
+      <!-- 6. Style Reference Image -->
+      <div class="field-group">
+        <label>
+          Style Reference Image
+          <span class="hint" id="styleLabelHint">Loaded: style.png (Default Ink)</span>
+        </label>
+        <div class="style-box">
+          <div class="style-preview-header">
+            <span style="color: var(--gold-light); font-weight: 500;" id="styleFilename">Style Anchor: Genre Preset Active</span>
+            <span style="color: #4ade80;">Active</span>
+          </div>
+          <div class="style-preview-container">
+            <img id="stylePreviewImg" src="style.png" alt="Style Reference Preview">
+          </div>
+          <div class="style-actions">
+            <div class="file-input-wrapper">
+              <button class="btn-small" type="button">Change Style Image</button>
+              <input type="file" id="styleFileInput" accept="image/*">
+            </div>
+            <button class="btn-small" id="btnResetDefaultStyle" type="button" title="Clear Custom Image">Clear Image (Use Genre Preset)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Number of Pages (1 to 1000) -->
+      <div class="field-group">
+        <label for="pageCountInput">
+          Total Novella Length (Pages)
+          <span class="hint">1 to 1000 pages</span>
+        </label>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <input type="number" id="pageCountInput" min="1" max="1000" value="50" style="max-width: 120px;">
+          <div class="sample-pills" style="margin: 0;">
+            <button class="pill-btn" type="button" onclick="setPages(12)">12 Pgs</button>
+            <button class="pill-btn" type="button" onclick="setPages(24)">24 Pgs</button>
+            <button class="pill-btn" type="button" onclick="setPages(50)">50 Pgs</button>
+            <button class="pill-btn" type="button" onclick="setPages(100)">100 Pgs</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Character Cast Textbox (Name (Description) format) -->
+      <div class="field-group">
+        <label for="charactersInput">
+          Character Cast & Archetypes
+          <span class="hint">Format: Name (Description inside parentheses)</span>
+        </label>
+        <textarea id="charactersInput" style="min-height: 95px; font-family: monospace; font-size: 0.85rem;" placeholder="Name (Role / Description in parentheses)...">Malacor (The Sorrowful Lich, 7ft ancient guardian of forgotten dead)
+Elara (9yo fragile mortal child with an old iron lantern)
+The Echo (Unfinished phantom soul, daughter woven of starlight)
+Inquisitor Hesketh (8ft dogmatic zealot knight with chained greatsword)</textarea>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: Story Bible (with Spoiler Mask) & Live Studio -->
+    <section style="display: flex; flex-direction: column; gap: 2rem;">
+
+      <!-- STORY BIBLE PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>THE 5 MOVEMENTS (STORY BIBLE)</span>
+          </div>
+          <span class="panel-step-badge">STEP 2</span>
+        </div>
+
+        <!-- Spoiler-Free Editing Toggle Banner -->
+        <div class="spoiler-toggle-card">
+          <div class="spoiler-info">
+            <div class="spoiler-icon">🔒</div>
+            <div>
+              <div class="spoiler-title">Spoiler-Free Editing Mode</div>
+              <div class="spoiler-sub">Masks Acts II to V so you can review Act I without spoiling the climax</div>
+            </div>
+          </div>
+          <label class="switch" title="Toggle Spoiler Masking">
+            <input type="checkbox" id="spoilerToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- 5 Acts Accordion -->
+        <div class="acts-accordion" id="actsAccordion">
+
+          <!-- Act 1 -->
+          <div class="act-card" id="actCard1">
+            <div class="act-header">
+              <div class="act-title-tag">
+                <span style="opacity: 0.7;">📜</span>
+                <input type="text" class="act-title-input" id="actTitle1" value="Movement I: The Vigil" placeholder="Movement I Title">
+              </div>
+              <span class="act-pages-range">Pages 1 – 10</span>
+            </div>
+            <div class="act-content">
+              <textarea id="actText1">The ancient abyss of The Depths Untold. Malacor the Sorrowful Lich dwells in silence beside a black subterranean lake, inscribing names of erased lives into The Grimoire with ash-ink. A distant heartbeat disturbs the dark. 9-year-old mortal child Elara tumbles through a breach from the burning world above, her lantern dying. Looming over her, the Lich speaks: 'You are leaking warmth, little flame. The stone here will drink you dry if you do not close your lips.'</textarea>
+            </div>
+          </div>
+
+          <!-- Act 2 (Masked) -->
+          <div class="act-card spoiler-blurred" id="actCard2">
+            <div class="act-header">
+              <div class="act-title-tag">
+                <span style="opacity: 0.7;">📜</span>
+                <input type="text" class="act-title-input" id="actTitle2" value="Movement II: The Anatomy of Memory" placeholder="Movement II Title">
+              </div>
+              <span class="act-pages-range">Pages 11 – 20</span>
+            </div>
+            <div class="spoiler-overlay" onclick="toggleRevealAct(2)">
+              <span>👁️ Click to Temporarily Reveal Act II</span>
+            </div>
+            <div class="act-content">
+              <textarea id="actText2">Instead of preying upon the child, Malacor gently drapes an imperial royal burial shroud over her shivering shoulders and rekindles her lantern with a spark of blue-white starlight. The Echo (the spirit of his lost daughter) appears. Malacor reveals his cenotaph: the Sun Church burns heretics above to erase them; below, Malacor fishes their souls from the dark water and carves their names so they can never be unmade.</textarea>
+            </div>
+          </div>
+
+          <!-- Act 3 (Masked) -->
+          <div class="act-card spoiler-blurred" id="actCard3">
+            <div class="act-header">
+              <div class="act-title-tag">
+                <span style="opacity: 0.7;">📜</span>
+                <input type="text" class="act-title-input" id="actTitle3" value="Movement III: The Solar Iron" placeholder="Movement III Title">
+              </div>
+              <span class="act-pages-range">Pages 21 – 30</span>
+            </div>
+            <div class="spoiler-overlay" onclick="toggleRevealAct(3)">
+              <span>👁️ Click to Temporarily Reveal Act III</span>
+            </div>
+            <div class="act-content">
+              <textarea id="actText3">The ceiling shatters. Inquisitor Knight Hesketh (8ft tall, brutal blackened plate etched with radiant sun-eyes) descends, hacking through ancestral bone monuments in holy fury. He moves to execute Elara, declaring her tainted by the grave. Malacor steps between them, taking the colossal chained greatsword directly through his ribs. No blood spills—only stone dust and starlight. Malacor clamps his hand on the blade: 'You bring the Sun into the dark, Knight. Yet you cast no light. Only ash.'</textarea>
+            </div>
+          </div>
+
+          <!-- Act 4 (Masked) -->
+          <div class="act-card spoiler-blurred" id="actCard4">
+            <div class="act-header">
+              <div class="act-title-tag">
+                <span style="opacity: 0.7;">📜</span>
+                <input type="text" class="act-title-input" id="actTitle4" value="Movement IV: The Uneathing" placeholder="Movement IV Title">
+              </div>
+              <span class="act-pages-range">Pages 31 – 40</span>
+            </div>
+            <div class="spoiler-overlay" onclick="toggleRevealAct(4)">
+              <span>👁️ Click to Temporarily Reveal Act IV</span>
+            </div>
+            <div class="act-content">
+              <textarea id="actText4">The Grimoire levitates and blazes open to a 300-year-old entry: Lord Vane of the Iron March. A silent skeleton steps forward bearing Hesketh's exact family crest. Malacor reveals Vane was murdered by his own corrupt bishops for showing mercy, while the Church built monuments on lies. Malacor was once a cathedral archivist who chose the vow of bone when his daughter died in a manufactured famine. Hesketh's dogma collapses; his greatsword falls to the stone.</textarea>
+            </div>
+          </div>
+
+          <!-- Act 5 (Masked) -->
+          <div class="act-card spoiler-blurred" id="actCard5">
+            <div class="act-header">
+              <div class="act-title-tag">
+                <span style="opacity: 0.7;">📜</span>
+                <input type="text" class="act-title-input" id="actTitle5" value="Movement V: The Open Page" placeholder="Movement V Title">
+              </div>
+              <span class="act-pages-range">Pages 41 – 50</span>
+            </div>
+            <div class="spoiler-overlay" onclick="toggleRevealAct(5)">
+              <span>👁️ Click to Temporarily Reveal Act V</span>
+            </div>
+            <div class="act-content">
+              <textarea id="actText5">Hesketh removes his helmet—an exhausted, weeping old man. He vows to guard the breach forever. Malacor guides Elara up an underground river tunnel into an unburned green valley beyond the Church's reach. A father's gentle touch on her hair before she runs into the sun. Malacor returns to his solitary desk, dipping the stylus in ash. The final splash page reveals The Grimoire open: 'They believe the world is written in gold and flame. They are mistaken. The world is written in the names they could not bear to remember. Sleep now. I am still watching.'</textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 7. Page-by-Page Blueprint (One Per Page, Describing Nature & Impact) -->
+        <div class="page-blueprint-panel" id="pageBlueprintPanel" style="margin-top: 1.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div style="font-family: var(--font-title); font-size: 1.05rem; letter-spacing: 0.12em; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem;">
+                <span>📖 PAGE-BY-PAGE BLUEPRINT & IMPACT</span>
+                <span class="act-pages-range" id="blueprintCountBadge" style="color: var(--starlight-cyan); border-color: rgba(114, 185, 213, 0.3);">50 Pages</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                Granular scene nature, visual composition, and emotional resonance for each page (auto-saved to LocalStorage)
+              </div>
+            </div>
+
+            <!-- Trigger Button Placed on Top of Breakdown -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+              <button class="btn-master-action" id="btnGenPageBreakdown" type="button" style="padding: 8px 16px; font-size: 0.82rem; margin: 0; box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);">
+                ✨ Generate Page-by-Page Breakdown (<span id="btnPageCountNum">50</span> Pages)
+              </button>
+              <button class="btn-small" id="btnWriteScripts" type="button" title="Write panel-by-panel scripts with exact dialogue for the current outline, each page continuing from the last" style="padding: 7px 10px;">
+                ✍️ Write Panel Scripts
+              </button>
+              <button class="btn-small" id="btnToggleAllBreakdowns" type="button" title="Collapse or Expand View" style="padding: 7px 10px;">
+                ↕️ Toggle Compact
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress bar for generation -->
+          <div id="blueprintProgressBox" style="display: none; margin-bottom: 0.85rem; padding: 0.65rem 1rem; background: rgba(114, 185, 213, 0.08); border: 1px solid rgba(114, 185, 213, 0.3); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--starlight-cyan); justify-content: space-between; align-items: center;">
+            <span id="blueprintProgressText">Synthesizing page nature & impact with gemini-3.8-flash...</span>
+            <span class="sound-pulse playing" style="width: 8px; height: 8px; display: inline-block;"></span>
+          </div>
+
+          <!-- Scrollable Page Breakdown Container -->
+          <div class="page-breakdown-container" id="pageBreakdownContainer" style="max-height: 520px; overflow-y: auto; padding-right: 6px; display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Dynamically populated with one card per page -->
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE GENERATION STUDIO PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>VISUAL PRODUCTION STUDIO</span>
+          </div>
+          <span class="panel-step-badge">STEP 3</span>
+        </div>
+
+        <div style="display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center;">
+          <button class="btn-secondary" id="btnGenRefs" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            Generate Reference Sheets
+          </button>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); padding: 0.45rem 0.75rem; border-radius: var(--radius); border: 1px solid var(--border-subtle);">
+            <span style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">Start Page:</span>
+            <input type="number" id="genStartPageInput" value="1" min="1" max="1000" style="width: 52px; padding: 0.25rem 0.35rem; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--gold-light); border-radius: 4px; font-weight: 600; text-align: center; font-size: 0.85rem;" title="Start page number for sequential inking">
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); padding: 0.45rem 0.75rem; border-radius: var(--radius); border: 1px solid var(--border-subtle);">
+            <span style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap;">Ratio:</span>
+            <select id="studioAspectRatioSelect" style="padding: 0.25rem 0.5rem; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--gold-light); border-radius: 4px; font-size: 0.82rem; cursor: pointer;" title="Aspect ratio for inking pages">
+              <option value="3:4" selected>3:4 (Portrait)</option>
+              <option value="9:16">9:16 (Webtoon)</option>
+              <option value="16:9">16:9 (Cinematic)</option>
+              <option value="1:1">1:1 (Square)</option>
+              <option value="4:3">4:3 (Landscape)</option>
+            </select>
+          </div>
+
+          <button class="btn-master-action" id="btnGenManga" type="button" style="flex: 1; margin: 0; min-width: 260px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Generate All Pages in Order (<span id="btnPageCountNum">50</span> Pages)
+          </button>
+        </div>
+
+        <!-- Live Progress Status -->
+        <div class="pipeline-status-box" id="pipelineBox">
+          <div class="pipeline-log-text">
+            <span id="pipelineStatusLabel">Inking Chapter 1...</span>
+            <span id="pipelinePercent">0%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="pipelineBar"></div>
+          </div>
+        </div>
+
+        <!-- Live Gallery Feed -->
+        <div>
+          <label style="margin-bottom: 0.75rem;">
+            Generated Output Feed (All 50 Pages Available)
+            <span class="hint">Click any page to read in reader</span>
+          </label>
+          <div class="live-gallery-grid" id="liveGallery">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // --- Environment Key & Local Storage ---
+    const DEFAULT_KEY = ""; // your Gemini key lives only in this browser (localStorage), or in the GEMINI_API_KEY environment variable
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const statusDot = document.getElementById('statusDot');
+    const btnToggleKey = document.getElementById('btnToggleKey');
+
+    // Load API Key
+    const savedKey = localStorage.getItem('GEMINI_API_KEY') || DEFAULT_KEY;
+    apiKeyInput.value = savedKey;
+
+    apiKeyInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      localStorage.setItem('GEMINI_API_KEY', val);
+      updateKeyStatus(val);
+    });
+
+    btnToggleKey.addEventListener('click', () => {
+      if (apiKeyInput.type === 'password') {
+        apiKeyInput.type = 'text';
+        btnToggleKey.textContent = 'Hide';
+      } else {
+        apiKeyInput.type = 'password';
+        btnToggleKey.textContent = 'Show';
+      }
+    });
+
+    function updateKeyStatus(key) {
+      if (key && key.startsWith('AIza')) {
+        statusDot.style.background = '#4ade80';
+        statusDot.style.boxShadow = '0 0 8px #4ade80';
+      } else {
+        statusDot.style.background = '#eab308';
+        statusDot.style.boxShadow = '0 0 8px #eab308';
+      }
+    }
+    updateKeyStatus(savedKey);
+
+    // --- Toast Notification ---
+    const toast = document.getElementById('toast');
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // --- 7 Curated Emotional Impact Suggestions per Concept ---
+    const EMOTIONAL_SUGGESTIONS = {
+      dark_fantasy: [
+        { val: "melancholic", text: "1. 🌌 Melancholic & Transcendent (Poetic stillness, tragic dignity, starlight in bone)" },
+        { val: "cathartic", text: "2. 🕯️ Sacred Solace & Catharsis (Tenderness in the cold tomb, gentle tears)" },
+        { val: "dread", text: "3. 🌑 Crushing Dread & Inevitability (Abyssal shadows, suffocating silence)" },
+        { val: "grief", text: "4. ⚔️ Heroic Grief & Shattered Dogma (Sacrifice, blade breaking upon bone)" },
+        { val: "innocence", text: "5. 🕊️ Fragile Innocence Against the Void (A child's lantern amidst eternity)" },
+        { val: "ambiguity", text: "6. ⚖️ Solemn Moral Ambiguity (Neither monster nor savior, only remembrance)" },
+        { val: "release", text: "7. 🍂 Quiet Release & Peace (Solitary vigil, acceptance of the forgotten)" }
+      ],
+      cyberpunk: [
+        { val: "neon_gloom", text: "1. 🌧️ Neon Melancholy & Terminal Solitude (Rain on rusted chrome)" },
+        { val: "sensory", text: "2. ⚡ Kinetic Adrenaline & Overload (Speedlines, overclocked reflexes)" },
+        { val: "ghost", text: "3. 💾 Ghostly Longing & Digital Ghosthood (Fading memories on a drive)" },
+        { val: "noir", text: "4. 🕶️ Cynical Noir Nihilism (Smoke, whiskey, corrupt towers)" },
+        { val: "rebellion", text: "5. 🩸 Desperate Rebellion Against the Megacorp (Defiance to the end)" },
+        { val: "flesh", text: "6. 💔 Fading Humanity in Synthetic Flesh (The cost of augmentation)" },
+        { val: "singularity", text: "7. 🌐 Transcendent Singularity & Escape (Dissolving into the grid)" }
+      ],
+      mythic: [
+        { val: "grandeur", text: "1. 🏔️ Awe-Inspiring Epochal Grandeur (Monuments of a lost age)" },
+        { val: "erosion", text: "2. ⏳ The Slow Erosion of Ancient Oaths (Fulfilling duty past the end)" },
+        { val: "defiance", text: "3. 🔥 Blazing Defiance Against Extinction (Standing against the sun)" },
+        { val: "reverence", text: "4. 🌿 Tender Reverence for the Last Green Ember (Guarding fragile life)" },
+        { val: "brotherhood", text: "5. 🛡️ Stoic Solitude in the Face of Ruin (Unbroken silence)" },
+        { val: "tragedy", text: "6. 🌪️ Tragic Misunderstanding of the Ancient Gods (Forgotten purpose)" },
+        { val: "dawn", text: "7. 🌅 Dawn Breaking Over Petrified Stones (Bittersweet new era)" }
+      ]
+    };
+
+    function populateEmotionalSuggestions(category = "dark_fantasy") {
+      const select = document.getElementById('emotionalImpact');
+      select.innerHTML = '';
+      const list = EMOTIONAL_SUGGESTIONS[category] || EMOTIONAL_SUGGESTIONS.dark_fantasy;
+      list.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = item.val;
+        opt.textContent = item.text;
+        if (idx === 0) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+    // Initialize with 7 suggestions immediately
+    populateEmotionalSuggestions("dark_fantasy");
+
+    // --- Master Prompt Presets ---
+    const PROMPTS = {
+      grimoire: "A very dark fantasy story called Grimoire. The main character is a sorrowful necromancer Lich named Malacor who lives in the lightless Depths Untold. It is an emotional tale where necromancy is not malice, but an ancient duty of memory to preserve those forgotten by the tyrannical Sun Church. When a fragile 9-year-old mortal child named Elara falls into the tomb clutching a dying lantern, the Lich chooses to shelter her rather than consume her warmth.",
+      cyberpunk: "A rain-drenched cyberpunk noir story called Soul In Silicon. A cybernetic detective named Jax hunts illegal AI constructs in the depths of Sector 0. His only companion is an illegal rogue hologram of his deceased sister, Maeve. When a megacorp hitman corners them, Jax must decide whether to purge Maeve's memory drive to save his own organic shell or burn the grid down with them.",
+      last_tree: "A poetic grimdark epic called The Iron Ash. On a petrified dying world where trees have turned to iron, an immortal stone titan named Torum tends the very last living sapling in an underground cavern. A nomadic sun-tribe arrives seeking to burn the tree for warmth to survive their final winter."
+    };
+
+    function loadPrompt(type) {
+      if (PROMPTS[type]) {
+        document.getElementById('masterPrompt').value = PROMPTS[type];
+        extractCharactersFromPrompt(PROMPTS[type]);
+        const cat = type === "cyberpunk" ? "cyberpunk" : (type === "last_tree" ? "mythic" : "dark_fantasy");
+        populateEmotionalSuggestions(cat);
+        showToast("Loaded " + type.toUpperCase() + " Concept & 7 Emotional Resonances");
+      }
+    }
+
+    // --- 🛡️ Make Master Prompt Copyright-Free ---
+    const btnSanitizeCopyright = document.getElementById('btnSanitizeCopyright');
+    if (btnSanitizeCopyright) {
+      btnSanitizeCopyright.addEventListener('click', async () => {
+        const masterPromptEl = document.getElementById('masterPrompt');
+        const originalText = masterPromptEl.value.trim();
+        const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+        if (!originalText) {
+          showToast("Please enter a master story prompt to sanitize.");
+          return;
+        }
+
+        const originalBtnHTML = btnSanitizeCopyright.innerHTML;
+        btnSanitizeCopyright.disabled = true;
+        btnSanitizeCopyright.innerHTML = `<span>⏳</span> Neutralizing...`;
+
+        try {
+          if (apiKey) {
+            // Use Gemini 3.8 Flash to rewrite prompt into copyright-free original lore
+            const systemPrompt = `You are an intellectual property & narrative copyright sanitization specialist for graphic novels.
+Given a story concept, detect and remove any trademarked, copyrighted, or proprietary franchise names, company names, or famous character names (e.g., from Marvel, DC, Disney, Star Wars, Berserk, Dark Souls, Warhammer, Lord of the Rings, Naruto, Dragon Ball, Cyberpunk 2077, Nintendo, Blizzard, etc.).
+Rewrite the concept so that:
+1. Every trademarked name, proprietary character, or franchise term is completely replaced with original archetype placeholders, descriptive titles, or evocative original fantasy/sci-fi names (e.g. "Guts" -> "The Scarred Wanderer", "Berserk" -> "A Grim Dark-Fantasy Graphic Novella", "Darth Vader" -> "The Obsidian Overlord", "Jedi" -> "Aether Monks", "Space Marine" -> "Iron-Clad Vanguard").
+2. The exact dramatic tension, thematic depth, emotional atmosphere, and plot stakes are preserved 100%.
+3. Output ONLY the rewritten, sanitized prompt text in English. Do NOT add any preamble, conversational commentary, or quotes.`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+            const resp = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: originalText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+              })
+            });
+
+            if (resp.ok) {
+              const data = await resp.json();
+              const sanitizedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+              if (sanitizedText) {
+                masterPromptEl.value = sanitizedText;
+                extractCharactersFromPrompt(sanitizedText);
+                triggerAutoSave();
+                showToast("🛡️ Master prompt sanitized: 100% copyright-free & original!");
+                return;
+              }
+            }
+          }
+
+          // Local dictionary and regex sanitization fallback
+          let cleaned = originalText;
+          const replacements = [
+            [/\bBerserk\b/gi, "a grim dark-fantasy graphic novella"],
+            [/\bGuts\b/gi, "the Scarred Wanderer"],
+            [/\bGriffith\b/gi, "the Golden Falcon Knight"],
+            [/\bCasca\b/gi, "the Exiled Swordswoman"],
+            [/\bDark Souls\b/gi, "the Ashen Age of Ruin"],
+            [/\bElden Ring\b/gi, "the Shattered Golden Covenant"],
+            [/\bBloodborne\b/gi, "the Night of the Crimson Moon"],
+            [/\bStar Wars\b/gi, "the Void Odyssey"],
+            [/\bJedi\b/gi, "Aether Monk"],
+            [/\bSith\b/gi, "Shadow Cultist"],
+            [/\bDarth Vader\b/gi, "the Obsidian Commander"],
+            [/\bLightsaber\b/gi, "plasma-forged blade"],
+            [/\bWarhammer\b/gi, "the Eternal Siege of Iron"],
+            [/\bSpace Marine\b/gi, "Armored Titan Vanguard"],
+            [/\bBatman\b/gi, "the Shrouded Vigilante"],
+            [/\bSuperman\b/gi, "the Solar Champion"],
+            [/\bJoker\b/gi, "the Smiling Anarchist"],
+            [/\bMarvel\b/gi, "the Paragon Pantheon"],
+            [/\bAvengers\b/gi, "the Allied Champions"],
+            [/\bSpider-Man\b/gi, "the Web-Weaving Acrobat"],
+            [/\bNaruto\b/gi, "the Fox-Spirit Shinobi"],
+            [/\bSasuke\b/gi, "the Shadow Avenger"],
+            [/\bDragon Ball\b/gi, "the Celestial Martial Epic"],
+            [/\bGoku\b/gi, "the Sun-Wukong Martial Sage"],
+            [/\bPokemon\b/gi, "Spirit Beasts"],
+            [/\bLich King\b/gi, "the Frost Sovereign of the Frozen Spire"]
+          ];
+
+          replacements.forEach(([pattern, repl]) => {
+            cleaned = cleaned.replace(pattern, repl);
+          });
+
+          masterPromptEl.value = cleaned;
+          extractCharactersFromPrompt(cleaned);
+          triggerAutoSave();
+          showToast("🛡️ Trademarked names replaced with original archetype placeholders!");
+
+        } catch (err) {
+          console.error("Sanitization error:", err);
+          showToast("Could not sanitize: " + err.message);
+        } finally {
+          btnSanitizeCopyright.disabled = false;
+          btnSanitizeCopyright.innerHTML = originalBtnHTML;
+        }
+      });
+    }
+
+    // --- Master Prompt Button Click Handler with REAL GEMINI 3.8 FLASH ---
+    document.getElementById('btnSynthesizeBible').addEventListener('click', async () => {
+      const prompt = document.getElementById('masterPrompt').value.trim();
+      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      const totalPages = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+      const btn = document.getElementById('btnSynthesizeBible');
+
+      if (!prompt) {
+        showToast("Please enter a master story prompt first.");
+        return;
+      }
+      if (!apiKey) {
+        showToast("Please enter your Google API Key at the top.");
+        return;
+      }
+
+      const originalBtnHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span> Synthesizing with Gemini 3.8 Flash...`;
+      showToast("Calling Gemini 3.8 Flash to analyze concept...");
+
+      try {
+        const selectedStyle = document.getElementById('genreStyleSelect')?.value || 'whimsical_fantasy';
+        const styleName = document.getElementById('genreStyleSelect')?.selectedOptions[0]?.textContent || selectedStyle;
+
+        const systemInstruction = `You are a master manga editor, narrative architect, and creative director.
+CRITICAL MANDATES:
+- Respect the user's intended tone, genre, and themes exactly as described in their concept. If the story is cute, whimsical, comedic, or lighthearted (e.g. gnomes, talking pugs, fun adventures), KEEP IT JOYFUL, CHARMING, AND REFRESHING!
+- NEVER force grimdark, horror, undead, or gothic tropes onto a lighthearted adventure.
+- Target Genre & Visual Art Style: "${styleName}".
+Given the master story concept and total page count (${totalPages}), output a strictly valid JSON object with:
+1. "emotional_impacts": array of EXACTLY 7 distinct, creative emotional resonances or tonal guidelines tailored specifically to this story's true genre and mood (e.g. for lighthearted: "✨ Whimsical Wonder", "⚙️ Tense Slapstick Engineering", "🐶 Deadpan Aristocratic Wit", etc.).
+2. "characters": string containing 3 to 5 key characters, strictly formatted as:
+Name (Description or role inside parentheses)
+faithful to the characters requested in the concept.
+3. "act1_title": Movement I evocative title (e.g. "Movement I: The Spark at Tinker-Hollow").
+4. "act1": Movement I breakdown (approx 2-3 sentences).
+5. "act2_title": Movement II evocative title.
+6. "act2": Movement II breakdown.
+7. "act3_title": Movement III evocative title.
+8. "act3": Movement III breakdown.
+9. "act4_title": Movement IV evocative title.
+10. "act4": Movement IV breakdown.
+11. "act5_title": Movement V evocative title.
+12. "act5": Movement V breakdown.
+Write all content in English.`;
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: `Story Concept: ${prompt}\nTarget Pages: ${totalPages}` }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        };
+
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(`Gemini 3.8 Flash Error (${resp.status}): ${errText.slice(0, 150)}`);
+        }
+
+        const data = await resp.json();
+        const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawJson) throw new Error("No response returned from Gemini 3.8 Flash.");
+
+        const result = JSON.parse(rawJson);
+
+        // Populate 7 Emotional Impacts
+        if (result.emotional_impacts && Array.isArray(result.emotional_impacts)) {
+          const select = document.getElementById('emotionalImpact');
+          select.innerHTML = '';
+          result.emotional_impacts.slice(0, 7).forEach((item, idx) => {
+            const opt = document.createElement('option');
+            opt.value = `custom_${idx}`;
+            opt.textContent = item.startsWith(`${idx+1}.`) ? item : `${idx + 1}. ${item}`;
+            if (idx === 0) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }
+
+        // Populate Characters
+        if (result.characters) {
+          document.getElementById('charactersInput').value = result.characters.trim();
+        }
+
+        // Populate Acts & Titles
+        if (result.act1_title && document.getElementById('actTitle1')) document.getElementById('actTitle1').value = result.act1_title;
+        if (result.act1) document.getElementById('actText1').value = result.act1;
+        if (result.act2_title && document.getElementById('actTitle2')) document.getElementById('actTitle2').value = result.act2_title;
+        if (result.act2) document.getElementById('actText2').value = result.act2;
+        if (result.act3_title && document.getElementById('actTitle3')) document.getElementById('actTitle3').value = result.act3_title;
+        if (result.act3) document.getElementById('actText3').value = result.act3;
+        if (result.act4_title && document.getElementById('actTitle4')) document.getElementById('actTitle4').value = result.act4_title;
+        if (result.act4) document.getElementById('actText4').value = result.act4;
+        if (result.act5_title && document.getElementById('actTitle5')) document.getElementById('actTitle5').value = result.act5_title;
+        if (result.act5) document.getElementById('actText5').value = result.act5;
+
+        updatePageRanges(totalPages);
+        triggerAutoSave();
+        showToast("✨ Gemini 3.8 Flash successfully synthesized Story & 7 Resonances!");
+      } catch (err) {
+        console.error("Gemini 3.8 Flash error:", err);
+        showToast(err.message || "Failed to call Gemini 3.8 Flash");
+        // Fallback local synthesis if offline
+        extractCharactersFromPrompt(prompt);
+        populateEmotionalSuggestions(selectedStyle);
+        updatePageRanges(totalPages);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnHTML;
+      }
+    });
+
+    function setPages(n) {
+      document.getElementById('pageCountInput').value = n;
+      updatePageRanges(n);
+      showToast(`Novella set to ${n} Pages`);
+    }
+
+    document.getElementById('pageCountInput').addEventListener('input', (e) => {
+      let val = parseInt(e.target.value, 10);
+      if (val < 1) val = 1;
+      if (val > 1000) val = 1000;
+      updatePageRanges(val);
+    });
+
+    function updatePageRanges(total) {
+      const step = Math.ceil(total / 5);
+      for (let i = 1; i <= 5; i++) {
+        const start = (i - 1) * step + 1;
+        const end = Math.min(i * step, total);
+        const card = document.getElementById(`actCard${i}`);
+        if (card) {
+          const badge = card.querySelector('.act-pages-range');
+          if (badge) badge.textContent = `Pages ${start} – ${end}`;
+        }
+      }
+      const countNum = document.getElementById('btnPageCountNum');
+      if (countNum) countNum.textContent = total;
+      const blueprintBadge = document.getElementById('blueprintCountBadge');
+      if (blueprintBadge) blueprintBadge.textContent = `${total} Pages`;
+    }
+
+    // --- Extract Characters Fallback Logic ---
+    function extractCharactersFromPrompt(text) {
+      const charBox = document.getElementById('charactersInput');
+      if (text.includes("Grimoire") || text.includes("Malacor")) {
+        charBox.value = 
+`Malacor (The Sorrowful Lich, 7ft ancient guardian of forgotten dead)
+Elara (9yo fragile mortal child with an old iron lantern)
+The Echo (Unfinished phantom soul, daughter woven of starlight)
+Inquisitor Hesketh (8ft dogmatic zealot knight with chained greatsword)`;
+      } else if (text.includes("Jax") || text.includes("Silicon")) {
+        charBox.value = 
+`Jax (Cybernetic trenchcoat detective, augmented ocular implants)
+Maeve (Glitching starlight cyan hologram of deceased sister)
+Unit V-9 (Heavy chrome corporate strike inquisitor)`;
+      } else if (text.includes("Torum") || text.includes("Iron Ash")) {
+        charBox.value = 
+`Torum (Ancient monolithic stone titan, moss-covered shoulders)
+The Sprout (The last delicate green living sapling in existence)
+Kael (Frostbitten nomad hunter carrying a sputtering torch)`;
+      }
+    }
+
+    // --- Style Reference Image (style.png by default) ---
+    const stylePreviewImg = document.getElementById('stylePreviewImg');
+    const styleFileInput = document.getElementById('styleFileInput');
+    
+    function getActiveStyleDescriptor() {
+      const select = document.getElementById('genreStyleSelect');
+      const val = select ? select.value : 'whimsical_fantasy';
+      const styles = {
+        'whimsical_fantasy': 'Charming whimsical fantasy manga, Studio Ghibli and Hayao Miyazaki inspired aesthetic, cute expressive character design, warm detailed linework, delightful steampunk gadgetry',
+        'dark_fantasy': 'Grimdark dark fantasy manga, Kentaro Miura Berserk ink style, stark high contrast, deep shadows, fine crosshatching, dramatic chiaroscuro',
+        'shonen_adventure': 'High-energy Shonen manga comic, dynamic action perspective, bold clean ink lines, cinematic speedlines, heroic character design',
+        'cyberpunk_scifi': 'Cyberpunk sci-fi graphic novel, Moebius ligne-claire aesthetic, intricate technological details, clean architectural line-art',
+        'classic_manga': 'Classic Japanese manga, clean monochrome screentone textures, expressive character acting, clean linework',
+        'custom': 'Expressive graphic novel comic art style faithful to the story concept'
+      };
+      return styles[val] || styles['whimsical_fantasy'];
+    }
+
+    const genreStyleSelect = document.getElementById('genreStyleSelect');
+    if (genreStyleSelect) {
+      genreStyleSelect.addEventListener('change', () => {
+        const selectedOpt = genreStyleSelect.selectedOptions[0]?.textContent || '';
+        if (!activeCustomStyleBase64 && currentProjectSlug !== 'grimoire') {
+          styleFilename.textContent = 'Preset: ' + selectedOpt.split('(')[0].trim();
+        }
+        showToast('Art Style set to: ' + selectedOpt.split('(')[0].trim());
+        triggerAutoSave();
+      });
+    }
+
+    const styleFilename = document.getElementById('styleFilename');
+    const btnResetDefaultStyle = document.getElementById('btnResetDefaultStyle');
+    let activeCustomStyleBase64 = null;
+
+    styleFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          activeCustomStyleBase64 = ev.target.result;
+          stylePreviewImg.src = activeCustomStyleBase64;
+          styleFilename.textContent = file.name + " (Custom Reference)";
+          showToast("Custom Style Reference Loaded: " + file.name);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    btnResetDefaultStyle.addEventListener('click', () => {
+      activeCustomStyleBase64 = null;
+      stylePreviewImg.src = "style.png";
+      styleFilename.textContent = "style.png (Kentaro Miura Berserk Ink)";
+      styleFileInput.value = "";
+      showToast("Reset to default style.png");
+    });
+
+    // --- Spoiler-Free Editing Mode ---
+    const spoilerToggle = document.getElementById('spoilerToggle');
+    spoilerToggle.addEventListener('change', (e) => {
+      const isMasked = e.target.checked;
+      for (let i = 2; i <= 5; i++) {
+        const card = document.getElementById(`actCard${i}`);
+        if (card) {
+          card.classList.toggle('spoiler-blurred', isMasked);
+          card.classList.remove('spoiler-revealed');
+        }
+      }
+      showToast(isMasked ? "Spoiler Mask Engaged (Acts II–V Blurred)" : "Spoiler Mask Disabled");
+    });
+
+    function toggleRevealAct(actNum) {
+      const card = document.getElementById(`actCard${actNum}`);
+      if (card) {
+        card.classList.toggle('spoiler-revealed');
+      }
+    }
+
+    // --- Export Bible & Page Breakdown to Markdown & Server ---
+    document.getElementById('btnExportBible').addEventListener('click', () => {
+      const prompt = document.getElementById('masterPrompt').value;
+      const chars = document.getElementById('charactersInput').value;
+      const totalPages = document.getElementById('pageCountInput').value;
+      const impact = document.getElementById('emotionalImpact').value;
+      const title = document.getElementById('projectTitleInput').value.trim() || "Manga";
+
+      let md = `# ${title.toUpperCase()} — Story & Script Bible (${totalPages} Pages)\n\n`;
+      md += `**Master Concept:**\n${prompt}\n\n`;
+      md += `**Emotional Resonance:** ${impact}\n\n`;
+      md += `## Cast of Characters:\n${chars}\n\n`;
+      md += `## The 5 Movements:\n\n`;
+
+      for (let i = 1; i <= 5; i++) {
+        const titleEl = document.getElementById(`actTitle${i}`);
+        const rangeEl = document.querySelector(`#actCard${i} .act-pages-range`);
+        const text = document.getElementById(`actText${i}`).value;
+        md += `### ${titleEl ? titleEl.value : 'Movement ' + i} (${rangeEl ? rangeEl.textContent : ''})\n${text}\n\n`;
+      }
+
+      // Add Page-by-Page Director's Blueprint
+      const pagesData = getPageBreakdownData();
+      if (pagesData && pagesData.length > 0) {
+        md += `## Page-by-Page Director's Blueprint (${pagesData.length} Pages)\n\n`;
+        pagesData.forEach(p => {
+          md += `### Page ${p.page}: ${p.title} (${p.movement})\n`;
+          md += `**Scene Nature & Visual Framing:**\n${p.nature}\n\n`;
+          md += `**Emotional Resonance & Impact:**\n${p.impact}\n\n`;
+          if (p.script) md += `**Panel Script:**\n${p.script}\n\n`;
+        });
+      }
+
+      // 1. Download Markdown
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.toLowerCase().replace(/[^a-z0-9]/g, '_')}_story_bible.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // 2. Also save to server directly
+      fetch('/api/save_story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project: currentProjectSlug, bible_text: md })
+      }).then(() => {
+        showToast("Story Bible & Page Breakdown Exported & Saved!");
+      }).catch(() => {
+        showToast("Story Bible Exported to Markdown!");
+      });
+    });
+
+
+    // =========================================================================
+    // --- PAGE-BY-PAGE BLUEPRINT & LOCALSTORAGE AUTO-SAVE SUBSYSTEM ---
+    // =========================================================================
+
+    const GRIMOIRE_50_PAGES = [
+  {
+    "page": 1,
+    "title": "The Silence of the Depths",
+    "movement": "Movement I: The Vigil",
+    "nature": "Full splash page establishing the lightless Depths Untold. Titan ribcages form bridges across an ancient subterranean lake. Malacor stands motionless in a ragged cowl, staff in hand.",
+    "impact": "Crushing silence, solemn antiquity, heavy subterranean dread giving way to awe."
+  },
+  {
+    "page": 2,
+    "title": "The Obsidian Altar",
+    "movement": "Movement I: The Vigil",
+    "nature": "Three widescreen panels. Malacor approaches the obsidian altar where The Grimoire rests upon carved dragon bones. Skeletal fingers trace the carved vertebrae spine.",
+    "impact": "Intimate reverence; ancient sacred duty preserved in the dark."
+  },
+  {
+    "page": 3,
+    "title": "The Ink of Names",
+    "movement": "Movement I: The Vigil",
+    "nature": "Top header banner in English. Close-up of ivory stylus dipping into grave-ash ink. Malacor inking forgotten souls onto ancient parchment.",
+    "impact": "Tragic solemnity; the weight of erased history etched in ash."
+  },
+  {
+    "page": 4,
+    "title": "The Cenotaph Hall",
+    "movement": "Movement I: The Vigil",
+    "nature": "High-angle perspective showing thousands of silent skeletal statues along the cavern galleries, each holding an inscribed stone tablet.",
+    "impact": "Staggering monumental scale; feeling the silent presence of millions of peaceful dead."
+  },
+  {
+    "page": 5,
+    "title": "The Disturbance",
+    "movement": "Movement I: The Vigil",
+    "nature": "Sudden split-panel contrast: the tranquil dark disturbed by faint reverberations from the burning world miles above.",
+    "impact": "Tension breaking through centuries of quietude; sudden foreboding."
+  },
+  {
+    "page": 6,
+    "title": "The Fissure Above",
+    "movement": "Movement I: The Vigil",
+    "nature": "Ceiling fracture pouring stone dust and a faint twilight beam into the black pool. Heavy splash echoing across the cavern.",
+    "impact": "Intrusion of the outside world; sudden shock and fragility."
+  },
+  {
+    "page": 7,
+    "title": "The Stray Awakens",
+    "movement": "Movement I: The Vigil",
+    "nature": "9-year-old Elara lying soaked on the cavern flagstones, coughing water, her soot-stained hand clutching a dying iron lantern.",
+    "impact": "Fragility of mortal life contrasted against cold eternal stone."
+  },
+  {
+    "page": 8,
+    "title": "Tomb of Echoes",
+    "movement": "Movement I: The Vigil",
+    "nature": "Elara slowly sitting up in the dim gloom, lantern sputtering out. Immense ribcage arches looming above her like teeth.",
+    "impact": "Disorienting vulnerability and childhood terror in the abyss."
+  },
+  {
+    "page": 9,
+    "title": "The Shadow Looming",
+    "movement": "Movement I: The Vigil",
+    "nature": "Low-angle dramatic shadow of the 7ft Lich towering over the small girl. Eyeless sockets catching blue-white starlight.",
+    "impact": "Terror peaking\u2014the archetype of the grim monster appearing before the child."
+  },
+  {
+    "page": 10,
+    "title": "You Are Leaking Warmth",
+    "movement": "Movement I: The Vigil",
+    "nature": "Malacor kneeling on one bony knee. Dialogue: 'You are leaking warmth, little flame. The stone here will drink you dry if you do not close your lips.'",
+    "impact": "Sudden, breathtaking tenderness reversing horror into paternal sanctuary."
+  },
+  {
+    "page": 11,
+    "title": "The Imperial Shroud",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Malacor gently draping a royal burial shroud with frayed silver fringe over Elara's trembling shoulders.",
+    "impact": "Warmth wrapping around shivering fragility; sacred paternal solace."
+  },
+  {
+    "page": 12,
+    "title": "The Starlit Kindling",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Malacor tapping Elara's lantern with his skeletal fingertip, sparking a blue-white starlight flame that never consumes wick.",
+    "impact": "A magical spark illuminating the dark; childhood wonder replacing dread."
+  },
+  {
+    "page": 13,
+    "title": "The Question of Bone",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Elara looking closely at Malacor's hand, touching the pale bone without flinching. Two-panel intimate conversation.",
+    "impact": "Innocence seeing beyond the terrifying exterior of death into the soul beneath."
+  },
+  {
+    "page": 14,
+    "title": "The Arrival of The Echo",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "The subterranean water parts without ripples as The Echo\u2014a translucent young maiden of starlight\u2014floats gently into the hall.",
+    "impact": "Haunting, ethereal beauty; the presence of an eternal daughter."
+  },
+  {
+    "page": 15,
+    "title": "The Remnant of Ash",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Elara opening her tiny clenched fist to show Malacor a pinch of gray ash and a dried flower from the burned world above.",
+    "impact": "The tragedy of mortal grief; the devastation of tyrannical zealotry."
+  },
+  {
+    "page": 16,
+    "title": "The Meaning of Death",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Malacor speaking: 'Death is a courtesy the living invented to excuse forgetting. I am merely what remains when the excuse is gone.'",
+    "impact": "Philosophical catharsis; redefining necromancy as love."
+  },
+  {
+    "page": 17,
+    "title": "The River of Souls",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Panoramic horizontal panel of the luminous subterranean river where faint souls drift like lanterns beneath the current.",
+    "impact": "Awe-inspiring epochal wonder; celestial grace under the earth."
+  },
+  {
+    "page": 18,
+    "title": "The Fisher of Souls",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Malacor extending his staff into the water, catching a glimmering soul-wisp and breathing gentle remembrance over it.",
+    "impact": "Gentle mercy; the patient shepherd of those thrown away by kings."
+  },
+  {
+    "page": 19,
+    "title": "The Carving of Names",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Elara sitting beside Malacor at the obsidian altar, watching him inscribe letters into the Grimoire.",
+    "impact": "Generational bonding between an ancient dead guardian and a living orphan."
+  },
+  {
+    "page": 20,
+    "title": "Sanctuary in the Stone",
+    "movement": "Movement II: The Anatomy of Memory",
+    "nature": "Wide cavern view: Elara sleeping soundly curled in the shroud beside the altar flame, guarded by Malacor and The Echo.",
+    "impact": "Absolute safety and peace before the coming tempest."
+  },
+  {
+    "page": 21,
+    "title": "The Sky Shatters",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Explosive multi-panel blast shattering the vaulted ceiling. Fiery incendiary shells and blinding orange smoke crashing down.",
+    "impact": "Violent sensory shock; peace violently obliterated by industrial holy war."
+  },
+  {
+    "page": 22,
+    "title": "The Descending Sun",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Colossal silhouette of Inquisitor Knight Hesketh descending on iron chains, armor etched with radiant sun-eyes.",
+    "impact": "Crushing, merciless military force; terrifying dogma incarnate."
+  },
+  {
+    "page": 23,
+    "title": "The Holy Threat",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Hesketh landing with earth-shattering weight, the flagstones splintering. Heavy plate glistening with holy oil.",
+    "impact": "Intimidating brutality and unstoppable religious fanaticism."
+  },
+  {
+    "page": 24,
+    "title": "Holy Vandalism",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Hesketh drawing his 7-foot chained executioner sword and smashing through ancestral bone monuments in holy fury.",
+    "impact": "Heartbreaking sacrilege; ancient memories pulverized to dust."
+  },
+  {
+    "page": 25,
+    "title": "The Desecration",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Malacor's calm expression turning grave as soul-dust swirls. Bone tablets clattering across the stone.",
+    "impact": "Rising righteous indignation; centuries of reverence insulted."
+  },
+  {
+    "page": 26,
+    "title": "The Unforgiving Eye",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Hesketh's slit visor locking onto the mortal child Elara huddled behind The Echo.",
+    "impact": "Impending execution; sickening dread for the child's life."
+  },
+  {
+    "page": 27,
+    "title": "The Falling Edge",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Dynamic speedlines: Hesketh lunging forward with a colossal two-handed cleave aimed straight at Elara.",
+    "impact": "Heart-stopping adrenaline; a defenseless child about to be cut in two."
+  },
+  {
+    "page": 28,
+    "title": "The Intercession",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Malacor blurring across the panel, stepping directly into the path of the falling blade.",
+    "impact": "Heroic sacrificial resolve; instantaneous paternal intervention."
+  },
+  {
+    "page": 29,
+    "title": "The Bite of Steel",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "The chained greatsword bites deep into Malacor's chest and ribs. No blood spills\u2014only stone dust and starlight.",
+    "impact": "Visceral impact; awe as the monster willingly takes the fatal blow."
+  },
+  {
+    "page": 30,
+    "title": "Ash and Light",
+    "movement": "Movement III: The Solar Iron",
+    "nature": "Malacor's skeletal hand clamps tight around the glowing blade edge, locking Hesketh in place: 'You cast no light. Only ash.'",
+    "impact": "Total power reversal; moral superiority shattering violent pride."
+  },
+  {
+    "page": 31,
+    "title": "The Book Awakens",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "The Grimoire levitates off the altar, pages flipping furiously with spectral golden embers.",
+    "impact": "Mystical revelation; the book of truth seizing control of reality."
+  },
+  {
+    "page": 32,
+    "title": "The Blazing Name",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "A 300-year-old page illuminates with burning letters: 'VANE OF THE IRON MARCH'.",
+    "impact": "Sudden cognitive dissonance; ancient hidden history coming to light."
+  },
+  {
+    "page": 33,
+    "title": "The Ancestor in the Bone",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "A weathered skeleton monument steps out of the shadow bearing the identical crest of Hesketh's family.",
+    "impact": "Chilling revelation; confrontation with one's own forgotten bloodline."
+  },
+  {
+    "page": 34,
+    "title": "The Slain Martyr",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "Flashback panel: Lord Vane executed in secret by the Sun Church's bishops for sheltering heretic orphans.",
+    "impact": "Shattering betrayal; the lie of the holy institution laid bare."
+  },
+  {
+    "page": 35,
+    "title": "The Cracking of Dogma",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "Extreme close-up of Hesketh's visor trembling, his breathing ragged as his worldview disintegrates.",
+    "impact": "Psychological collapse; the agonizing agony of disillusionment."
+  },
+  {
+    "page": 36,
+    "title": "The First Page",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "Malacor turning the book back to its very first inscription from centuries ago: his own daughter's name.",
+    "impact": "Deep personal vulnerability; recognizing the shared grief between warrior and scribe."
+  },
+  {
+    "page": 37,
+    "title": "The Scribe's Vow",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "Malacor recounting his vow: an archivist who chose deathless bone so truth would outlive the liars.",
+    "impact": "Moral transcendence; the unyielding power of righteous memory."
+  },
+  {
+    "page": 38,
+    "title": "The Living Witness",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "The Echo steps forward, placing her translucent hand over Hesketh's armored gauntlet.",
+    "impact": "Absolution without vengeance; profound forgiveness melting hate."
+  },
+  {
+    "page": 39,
+    "title": "The Fall of the Sword",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "The colossal chained greatsword slips from numb gauntlets, clanging heavily to the floor.",
+    "impact": "The surrender of violent pride; defeat transformed into liberation."
+  },
+  {
+    "page": 40,
+    "title": "Silence After Dogma",
+    "movement": "Movement IV: The Unearthing",
+    "nature": "Hesketh collapsing to both knees in the dust, the cavern descending into profound quiet.",
+    "impact": "Exhausted silence; the storm has passed, leaving only truth."
+  },
+  {
+    "page": 41,
+    "title": "The Unmasked Old Man",
+    "movement": "Movement V: The Open Page",
+    "nature": "Hesketh removing his brutal helmet\u2014revealing an aged, weeping face scarred by decades of hollow war.",
+    "impact": "Humanization of the villain; empathy for the manipulated soldier."
+  },
+  {
+    "page": 42,
+    "title": "The Shield at the Breach",
+    "movement": "Movement V: The Open Page",
+    "nature": "Hesketh picking up his broken crest and planting his blade before the ceiling breach as an eternal barrier.",
+    "impact": "Redemption through selfless penance; the inquisitor becomes the protector."
+  },
+  {
+    "page": 43,
+    "title": "The Hidden Way",
+    "movement": "Movement V: The Open Page",
+    "nature": "Malacor pointing with his staff down an underground river canyon where green vines and moss grow.",
+    "impact": "Hope dawning; a path toward life beyond the reach of burning churches."
+  },
+  {
+    "page": 44,
+    "title": "The Subterranean Ascent",
+    "movement": "Movement V: The Open Page",
+    "nature": "Malacor leading Elara along a gentle ascending path lined with glowing subterranean flora.",
+    "impact": "Gentle passage; moving from death back toward the living dawn."
+  },
+  {
+    "page": 45,
+    "title": "The Soul Blossom",
+    "movement": "Movement V: The Open Page",
+    "nature": "The Echo gifting Elara a blooming soul-flower that will stay vibrant forever.",
+    "impact": "A tender heirloom of the dead guarding the future of the living."
+  },
+  {
+    "page": 46,
+    "title": "The Father's Touch",
+    "movement": "Movement V: The Open Page",
+    "nature": "At the mouth of the cavern, Malacor gently touches Elara's forehead, wishing her long life in the sun.",
+    "impact": "Heart-wrenching farewell; pure selfless parental love."
+  },
+  {
+    "page": 47,
+    "title": "The Green Horizon",
+    "movement": "Movement V: The Open Page",
+    "nature": "Splash page: Elara stepping into a lush, unburned valley bathed in warm morning sunlight, looking back with a smile.",
+    "impact": "Radiant catharsis; the seed of life flourishing because the bone remembered."
+  },
+  {
+    "page": 48,
+    "title": "The Eternal Sentry",
+    "movement": "Movement V: The Open Page",
+    "nature": "Hesketh standing solitary guard at the underground breach, watching the darkness in peaceful vigil.",
+    "impact": "Stoic honor; an old man finding true purpose at the end of his life."
+  },
+  {
+    "page": 49,
+    "title": "The Return to Vigil",
+    "movement": "Movement V: The Open Page",
+    "nature": "Malacor walking slowly back to his solitary stone desk beside the black lake, dipping the stylus in ash.",
+    "impact": "Timeless serenity; duty without sorrow, love without end."
+  },
+  {
+    "page": 50,
+    "title": "Epilogue: The Inscription",
+    "movement": "Movement V: The Open Page",
+    "nature": "Final splash page: The Grimoire open wide. Text in English: 'They believe the world is written in gold and flame. They are mistaken. The world is written in the names they could not bear to remember. Sleep now. I am still watching.'",
+    "impact": "Transcendent emotional climax; unforgettable poetic finality."
+  }
+];
+
+    const pageBreakdownContainer = document.getElementById('pageBreakdownContainer');
+    const btnGenPageBreakdown = document.getElementById('btnGenPageBreakdown');
+    const btnToggleAllBreakdowns = document.getElementById('btnToggleAllBreakdowns');
+    const blueprintProgressBox = document.getElementById('blueprintProgressBox');
+    const blueprintProgressText = document.getElementById('blueprintProgressText');
+    const STORAGE_KEY = 'MANGA_STUDIO_FULL_STATE';
+    let isCompactBreakdownView = false;
+
+    function renderPageBreakdownUI(pagesList) {
+      if (!pageBreakdownContainer) return;
+      pageBreakdownContainer.innerHTML = '';
+      const total = pagesList.length;
+
+      const countNum = document.getElementById('btnPageCountNum');
+      if (countNum) countNum.textContent = total;
+      const blueprintBadge = document.getElementById('blueprintCountBadge');
+      if (blueprintBadge) blueprintBadge.textContent = total + " Pages";
+
+      pagesList.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'page-breakdown-card';
+        card.id = 'pageCard-' + item.page;
+        card.style.cssText = "background: rgba(10, 12, 16, 0.65); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem 1rem; transition: all 0.2s;";
+
+        const step = Math.ceil(total / 5);
+        const movementNum = Math.min(5, Math.ceil(item.page / Math.max(1, step)));
+        const movementLabel = item.movement || ('Movement ' + movementNum);
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(114, 185, 213, 0.2)); border: 1px solid rgba(212, 175, 55, 0.4); color: var(--gold-light); font-family: monospace; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: bold;">P.${item.page}</span>
+              <input type="text" class="page-title-input" data-page="${item.page}" value="${item.title || ('Page ' + item.page)}" placeholder="Page Scene Title..." style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.2); color: #fff; font-size: 0.85rem; font-weight: 600; padding: 2px 4px; outline: none; width: 220px;">
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">${movementLabel}</span>
+          </div>
+
+          <div class="card-body-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.68rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>🖼️ Scene Nature & Visual Framing</span>
+              </label>
+              <textarea class="page-nature-input" data-page="${item.page}" rows="2" style="width: 100%; font-size: 0.8rem; background: rgba(0,0,0,0.45); border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-main); padding: 6px; resize: vertical; line-height: 1.4;" placeholder="Describe panel framing, character action, and visual atmosphere...">${item.nature || ''}</textarea>
+            </div>
+            <div>
+              <label style="font-size: 0.68rem; color: var(--starlight-cyan); text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>⚡ Emotional Impact & Resonance</span>
+              </label>
+              <textarea class="page-impact-input" data-page="${item.page}" rows="2" style="width: 100%; font-size: 0.8rem; background: rgba(0,0,0,0.45); border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-main); padding: 6px; resize: vertical; line-height: 1.4;" placeholder="Reader emotional resonance and psychological tone...">${item.impact || ''}</textarea>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label style="font-size: 0.68rem; color: #4ade80; text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>🗨️ Panel Script & Dialogue</span>
+                <span style="text-transform: none; color: var(--text-muted);">Lettered word for word</span>
+              </label>
+              <textarea class="page-script-input" data-page="${item.page}" rows="5" style="width: 100%; font-size: 0.78rem; font-family: monospace; background: rgba(0,0,0,0.45); border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-main); padding: 6px; resize: vertical; line-height: 1.4;" placeholder="Panel 1: ...&#10;NAME: &quot;...&quot;&#10;(Click ✍️ Write Panel Scripts)"></textarea>
+            </div>
+          </div>
+        `;
+        // Set via .value: scripts are full of quotes that would break the template markup
+        const scriptInput = card.querySelector('.page-script-input');
+        scriptInput.value = item.script || '';
+        scriptInput.dataset.lang = item.scriptLang || '';
+        pageBreakdownContainer.appendChild(card);
+      });
+    }
+
+    function getPageBreakdownData() {
+      const data = [];
+      const total = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+      for (let i = 1; i <= total; i++) {
+        const tInput = document.querySelector('.page-title-input[data-page="' + i + '"]');
+        const nInput = document.querySelector('.page-nature-input[data-page="' + i + '"]');
+        const iInput = document.querySelector('.page-impact-input[data-page="' + i + '"]');
+        const sInput = document.querySelector('.page-script-input[data-page="' + i + '"]');
+        if (tInput || nInput || iInput) {
+          const step = Math.ceil(total / 5);
+          const movementNum = Math.min(5, Math.ceil(i / Math.max(1, step)));
+          data.push({
+            page: i,
+            title: tInput ? tInput.value.trim() : ('Page ' + i),
+            movement: 'Movement ' + movementNum,
+            nature: nInput ? nInput.value.trim() : '',
+            impact: iInput ? iInput.value.trim() : '',
+            script: sInput ? sInput.value.trim() : '',
+            scriptLang: sInput ? (sInput.dataset.lang || '') : ''
+          });
+        }
+      }
+      return data;
+    }
+
+    function generateProceduralBreakdown(total, promptText) {
+      const pages = [];
+      const step = Math.ceil(total / 5);
+      const actTitles = [
+        document.getElementById('actTitle1')?.value || "Movement I: The Opening",
+        document.getElementById('actTitle2')?.value || "Movement II: The Escalation",
+        document.getElementById('actTitle3')?.value || "Movement III: The Core Challenge",
+        document.getElementById('actTitle4')?.value || "Movement IV: The Turning Point",
+        document.getElementById('actTitle5')?.value || "Movement V: The Resolution"
+      ];
+      const actTexts = [
+        document.getElementById('actText1')?.value || "",
+        document.getElementById('actText2')?.value || "",
+        document.getElementById('actText3')?.value || "",
+        document.getElementById('actText4')?.value || "",
+        document.getElementById('actText5')?.value || ""
+      ];
+
+      for (let p = 1; p <= total; p++) {
+        const actIdx = Math.min(4, Math.floor((p - 1) / Math.max(1, step)));
+        const posInAct = (p - 1) % step + 1;
+        const actTitle = actTitles[actIdx];
+        const actSnippet = actTexts[actIdx].slice(0, 120);
+
+        let sceneFocus = "";
+        let impact = "";
+
+        if (posInAct === 1) {
+          sceneFocus = "Opening establishment of " + actTitle + ". Wide cinematic composition framing the environment and central character presence. Based on: " + actSnippet + "...";
+          impact = "Dramatic opening tone setting the atmosphere for this movement.";
+        } else if (posInAct === step || p === total) {
+          sceneFocus = "Climax of " + actTitle + ". Dynamic cinematic composition, pivotal confrontation and expressive character acting. Based on: " + actSnippet + "...";
+          impact = p === total ? "Transcendent poetic resolution leaving an unforgettable emotional imprint." : "Pivotal turning point shifting the stakes for the next movement.";
+        } else {
+          sceneFocus = "Sequential narrative development in " + actTitle + ". Multi-panel dialogue exchange and engaging visual pacing. Based on: " + actSnippet + "...";
+          impact = "Deepening immersion, narrative intrigue, and growing thematic resonance.";
+        }
+
+        const titlePrefix = actTitle.includes(':') ? actTitle.split(':')[1].trim() : 'Scene';
+        pages.push({
+          page: p,
+          title: titlePrefix + ' — Beat ' + posInAct,
+          movement: actTitle,
+          nature: sceneFocus,
+          impact: impact
+        });
+      }
+      return pages;
+    }
+
+    async function generatePageBreakdown(forceAI = false) {
+      const total = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+      const prompt = document.getElementById('masterPrompt').value.trim();
+      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      const impact = getEmotionalImpactLabel();
+
+      // Canonical Grimoire 50 pages fast-path (only for Grimoire project)
+      if (!forceAI && currentProjectSlug === 'grimoire' && (prompt.includes("Grimoire") || prompt.includes("Malacor")) && total === 50) {
+        renderPageBreakdownUI(GRIMOIRE_50_PAGES);
+        saveAllToLocalStorage();
+        showToast("Loaded canonical 50-page breakdown for Grimoire!");
+        return;
+      }
+
+      if (blueprintProgressBox) {
+        blueprintProgressBox.style.display = 'flex';
+        blueprintProgressText.textContent = "Synthesizing " + total + " page blueprints with gemini-3.8-flash...";
+      }
+
+      try {
+        if (!apiKey) throw new Error("Please enter your Google API Key at the top.");
+
+        const acts = [1, 2, 3, 4, 5].map(i => document.getElementById('actText' + i).value).join("\n---\n");
+        const chars = document.getElementById('charactersInput').value;
+
+        const systemInstruction = "You are a legendary manga director and layout architect.\n" +
+          "Given a graphic novel concept, characters, and 5 movement acts, generate a JSON array of exactly " + total + " page breakdown objects.\n" +
+          "Each object must have:\n" +
+          "- \"page\": integer (from 1 to " + total + ")\n" +
+          "- \"title\": string (evocative 3-5 word scene title)\n" +
+          "- \"movement\": string (e.g. \"Movement I: The Vigil\")\n" +
+          "- \"nature\": string (1-2 vivid sentences describing panel composition, visual framing, character actions, and visual inking mood matching the story genre)\n" +
+          "- \"impact\": string (1 punchy sentence describing reader emotional resonance and dramatic weight)\n" +
+          "STORY RULES:\n" +
+          "- The pages are ONE continuous story in strict chronological order. Each page advances the plot with a new, distinct beat that follows directly from the previous page.\n" +
+          "- Each key event (a departure, an arrival, a reveal) happens on exactly one page. Never restage or recap it on a later page.\n" +
+          "- Respect the concept's genre and tone exactly.\n" +
+          "CRITICAL: Return a STRICT JSON array only. No markdown fences. All text in English.";
+
+        const userMsg = "Story Concept: " + prompt + "\nEmotional Resonance: " + impact + "\nCharacters: " + chars + "\n5 Movements Summary:\n" + acts + "\nGenerate all " + total + " pages.";
+
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" + apiKey;
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: userMsg }] }],
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error("API HTTP " + resp.status + ": " + errText.slice(0, 100));
+        }
+
+        const data = await resp.json();
+        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          renderPageBreakdownUI(parsed);
+          saveAllToLocalStorage();
+          showToast("Generated " + parsed.length + " page blueprints with Gemini 3.8 Flash! Writing panel scripts...");
+          await runScriptWriter(apiKey);
+          return;
+        }
+        throw new Error("Invalid output format from model");
+      } catch (e) {
+        console.warn("AI generation note, using structured procedural blueprint:", e);
+        showToast(e.message + " — Populating structured breakdown");
+        const procedural = generateProceduralBreakdown(total, prompt);
+        renderPageBreakdownUI(procedural);
+        saveAllToLocalStorage();
+      } finally {
+        if (blueprintProgressBox) blueprintProgressBox.style.display = 'none';
+      }
+    }
+
+    if (btnGenPageBreakdown) {
+      btnGenPageBreakdown.addEventListener('click', () => generatePageBreakdown(true));
+    }
+
+    // =========================================================================
+    // --- PANEL SCRIPTS & PAGE PROMPTS (Narrative Continuity) ---
+    // =========================================================================
+    // Story logic lives in the panel scripts, written by the text model with the surrounding
+    // outline and the previous page's script in view. The image model only stages one scripted
+    // page at a time, so it has no room to invent, repeat or recap beats.
+
+    const SCRIPT_BATCH_SIZE = 10;
+    const btnWriteScripts = document.getElementById('btnWriteScripts');
+
+    // Option labels carry the meaning; values can be opaque ids like "custom_2"
+    function getEmotionalImpactLabel() {
+      const select = document.getElementById('emotionalImpact');
+      const label = select?.selectedOptions[0]?.textContent || select?.value || '';
+      return label.replace(/^\d+\.\s*/, '').trim();
+    }
+
+    async function callGeminiJson(systemText, userText, apiKey) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userText }] }],
+          systemInstruction: { parts: [{ text: systemText }] },
+          generationConfig: { responseMimeType: 'application/json' }
+        })
+      });
+      if (!resp.ok) {
+        const errText = await resp.text();
+        throw new Error(`Gemini HTTP ${resp.status}: ${errText.slice(0, 150)}`);
+      }
+      const data = await resp.json();
+      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!raw) throw new Error('Empty response from Gemini.');
+      return JSON.parse(raw);
+    }
+
+    function getScriptWriterInstruction(lang) {
+      const { name, scriptNote } = MANGA_LANGUAGES[lang];
+      return `You are a veteran comic scriptwriter turning a page-by-page outline into panel-by-panel scripts for an illustrator.
+The pages form ONE continuous story read in order.
+RULES:
+- Each page picks up exactly where the previous page ended and covers ONLY the beat in its own outline entry.
+- Never restage, repeat or recap an event from an earlier page (a departure or launch happens once), and never jump ahead to events from later pages.
+- 3 to 5 panels per page. Each panel gets a concrete visual description (shot, action, setting) that keeps locations, vehicles, props and outfits consistent with earlier pages.
+- At most 2 lines of dialogue per panel, each under 15 words, and no line is ever repeated. Use captions only when they add new information; no generic recaps like "And so the adventure begins".
+- Characters speak in the voices their descriptions imply. Respect the concept's genre and tone exactly.
+- Format each script as plain text, one item per line:
+Panel 1: <visual description>
+NAME: "<speech>"
+CAPTION: "<narration>"
+SFX: "<sound effect>"
+Panel 2: ...
+LANGUAGE: write the panel descriptions in English for the illustrator. Write every quoted dialogue line, caption and sound effect in ${name}. Keep the Panel/CAPTION/SFX labels and character names as they are. ${scriptNote}
+Return a STRICT JSON array of {"page": <integer>, "script": "<script text>"} objects, one per requested page.`;
+    }
+
+    // Writes scripts into `pages` in batches, each batch continuing from the previous batch's last script
+    async function writePanelScripts(pages, apiKey) {
+      const total = pages.length;
+      const lang = mangaLanguage;
+      const step = Math.ceil(total / 5);
+      const movements = [1, 2, 3, 4, 5].map(i => {
+        const start = (i - 1) * step + 1;
+        const end = Math.min(i * step, total);
+        if (start > end) return '';
+        const actTitle = document.getElementById('actTitle' + i)?.value || ('Movement ' + i);
+        return `${actTitle} (pages ${start}-${end}): ${document.getElementById('actText' + i)?.value || ''}`;
+      }).filter(Boolean).join('\n');
+
+      for (let start = 0; start < total; start += SCRIPT_BATCH_SIZE) {
+        const batch = pages.slice(start, start + SCRIPT_BATCH_SIZE);
+        const first = batch[0].page;
+        const last = batch[batch.length - 1].page;
+        if (blueprintProgressText) blueprintProgressText.textContent = `Writing panel scripts for pages ${first}–${last} of ${total}...`;
+
+        // A window of neighbouring outline entries keeps the prompt bounded for 1000-page books
+        const outline = pages.slice(Math.max(0, start - SCRIPT_BATCH_SIZE), start + 2 * SCRIPT_BATCH_SIZE)
+          .map(p => `Page ${p.page} — ${p.title}: ${p.nature}`).join('\n');
+        const prev = pages[start - 1];
+
+        const userMsg = [
+          `Story concept: ${document.getElementById('masterPrompt').value.trim()}`,
+          `Tone: ${getEmotionalImpactLabel()}`,
+          `Characters:\n${document.getElementById('charactersInput').value.trim()}`,
+          `The 5 movements:\n${movements}`,
+          `Page outline (surrounding pages for context):\n${outline}`,
+          prev && prev.script ? `Script of page ${prev.page}, the previous page. Continue directly from its last panel:\n${prev.script}` : '',
+          `Write panel scripts for pages ${first} to ${last}, following their outline entries.`
+        ].filter(Boolean).join('\n\n');
+
+        const parsed = await callGeminiJson(getScriptWriterInstruction(lang), userMsg, apiKey);
+        const scripts = Array.isArray(parsed) ? parsed : (parsed.pages || []);
+        scripts.forEach(s => {
+          const target = pages.find(p => p.page === Number(s.page));
+          if (target && typeof s.script === 'string') {
+            target.script = s.script.trim();
+            target.scriptLang = lang;
+          }
+        });
+
+        renderPageBreakdownUI(pages);
+        saveAllToLocalStorage();
+      }
+      return pages.filter(p => !p.script).length;
+    }
+
+    async function runScriptWriter(apiKey) {
+      const pages = getPageBreakdownData();
+      if (!pages.length) {
+        showToast("Generate the page-by-page breakdown first.");
+        return;
+      }
+      if (blueprintProgressBox) blueprintProgressBox.style.display = 'flex';
+      if (btnWriteScripts) btnWriteScripts.disabled = true;
+      btnMangaLang.disabled = true;
+      try {
+        const missing = await writePanelScripts(pages, apiKey);
+        showToast(missing
+          ? `Panel scripts written; ${missing} page(s) came back empty. Click ✍️ Write Panel Scripts to retry.`
+          : `✍️ Panel scripts written for all ${pages.length} pages!`);
+      } catch (e) {
+        console.error("Panel script error:", e);
+        showToast(`Panel script error: ${e.message}`);
+      } finally {
+        if (blueprintProgressBox) blueprintProgressBox.style.display = 'none';
+        if (btnWriteScripts) btnWriteScripts.disabled = false;
+        btnMangaLang.disabled = false;
+      }
+    }
+
+    if (btnWriteScripts) {
+      btnWriteScripts.addEventListener('click', () => {
+        const apiKey = document.getElementById('apiKeyInput').value.trim();
+        if (!apiKey) {
+          showToast("Please enter your Google API Key at the top.");
+          return;
+        }
+        runScriptWriter(apiKey);
+      });
+    }
+
+    function getLastPanel(script) {
+      if (!script) return '';
+      const panels = script.split(/\n(?=\s*Panel\s+\d+)/i);
+      return panels[panels.length - 1].replace(/\s+/g, ' ').trim();
+    }
+
+    // Describing the whole cast on every page invites the model to draw everyone, so keep only
+    // the characters this page mentions (falling back to the full cast when none match)
+    function getCharactersForPage(castText, pageText) {
+      const lines = castText.split('\n').map(l => l.trim()).filter(Boolean);
+      const text = pageText.toLowerCase();
+      const present = lines.filter(line => line.split('(')[0].toLowerCase().split(/[^a-z0-9]+/)
+        .some(word => word.length >= 3 && word !== 'the' && word !== 'and' && new RegExp(`\\b${word}\\b`).test(text)));
+      return (present.length ? present : lines).join('; ');
+    }
+
+    function buildPagePrompt(p) {
+      const sections = [
+        `Comic book page ${p.page} of ${p.total} from the graphic novel "${p.bookTitle}". It is one page of a continuous story, not a standalone episode.`
+      ];
+      if (p.previousEnding) {
+        sections.push(`This page continues directly from the previous page, which ended with: ${p.previousEnding}`);
+      }
+      sections.push(`THIS PAGE — "${p.sceneTitle}": ${p.sceneNature}`);
+      sections.push(p.script
+        ? `PANEL SCRIPT — draw exactly these panels, in this order, and nothing else:\n${p.script}`
+        : `Stage only the beat above, in 3 to 5 panels.`);
+      sections.push(`Characters (match the attached reference sheets exactly): ${p.characters}`);
+      sections.push(`Mood: ${p.mood}`);
+      sections.push(`Art style: ${p.style}. Page format: ${p.layout}.`);
+      const noExtras = 'Add no other text: no extra dialogue, no recap captions, no title banner, no page number.';
+      sections.push(!p.script
+        ? `Lettering: short ${p.language} dialogue, each line appearing once. No recap captions, no title banner, no page number.`
+        : p.translateScript
+          ? `Lettering: letter each scripted line of dialogue, caption and sound effect exactly once, translated faithfully into ${p.language}. ${noExtras}`
+          : `Lettering: letter each scripted line of dialogue, caption and sound effect exactly once, word for word, in ${p.language}. ${noExtras}`);
+      return sections.join('\n\n');
+    }
+
+    if (btnToggleAllBreakdowns) {
+      btnToggleAllBreakdowns.addEventListener('click', () => {
+        isCompactBreakdownView = !isCompactBreakdownView;
+        document.querySelectorAll('.page-breakdown-card .card-body-grid').forEach(grid => {
+          grid.style.display = isCompactBreakdownView ? 'none' : 'grid';
+        });
+        btnToggleAllBreakdowns.textContent = isCompactBreakdownView ? '↕️ Expand' : '↕️ Compact';
+      });
+    }
+
+    // --- Aspect Ratio Synchronization ---
+    const aspectRatioSelect = document.getElementById('aspectRatioSelect');
+    const studioAspectRatioSelect = document.getElementById('studioAspectRatioSelect');
+
+    // Panel layout guidance per ratio, so the model composes for the frame it is given
+    const ASPECT_RATIO_LAYOUTS = {
+      '3:4': 'Portrait 3:4 manga page, panels arranged in a classic top-to-bottom reading grid',
+      '9:16': 'Tall vertical 9:16 webtoon page, panels stacked top-to-bottom for mobile scrolling',
+      '16:9': 'Wide 16:9 cinematic landscape spread, panels arranged horizontally across the frame',
+      '1:1': 'Square 1:1 page, compact balanced panel grid',
+      '4:3': 'Landscape 4:3 comic page, panels arranged in wide horizontal tiers'
+    };
+
+    function getSelectedAspectRatio() {
+      const ratio = aspectRatioSelect?.value;
+      return ASPECT_RATIO_LAYOUTS[ratio] ? ratio : '3:4';
+    }
+
+    function updateAspectRatio(ratio) {
+      if (!ratio) ratio = "3:4";
+      const cssRatio = ratio.replace(':', '/');
+      document.documentElement.style.setProperty('--gallery-aspect-ratio', cssRatio);
+      if (aspectRatioSelect && aspectRatioSelect.value !== ratio) {
+        aspectRatioSelect.value = ratio;
+      }
+      if (studioAspectRatioSelect && studioAspectRatioSelect.value !== ratio) {
+        studioAspectRatioSelect.value = ratio;
+      }
+    }
+
+    if (aspectRatioSelect) {
+      aspectRatioSelect.addEventListener('change', (e) => {
+        updateAspectRatio(e.target.value);
+        triggerAutoSave();
+      });
+    }
+    if (studioAspectRatioSelect) {
+      studioAspectRatioSelect.addEventListener('change', (e) => {
+        updateAspectRatio(e.target.value);
+        triggerAutoSave();
+      });
+    }
+
+    // --- Manga Text Language (dialogue, captions, SFX & lettering; the interface stays in English) ---
+    const MANGA_LANGUAGES = {
+      en: { name: 'English', scriptNote: '' },
+      fr: { name: 'French', scriptNote: 'Write natural, idiomatic French with correct accents (é, è, ê, à, ç) and French comic onomatopoeia (BOUM, VLAN, CLAC).' }
+    };
+    let mangaLanguage = 'en';
+    const btnMangaLang = document.getElementById('btnMangaLang');
+
+    function setMangaLanguage(lang) {
+      mangaLanguage = MANGA_LANGUAGES[lang] ? lang : 'en';
+      btnMangaLang.querySelectorAll('.lang-seg').forEach(seg => {
+        seg.classList.toggle('active', seg.dataset.lang === mangaLanguage);
+      });
+      btnMangaLang.setAttribute('aria-label', `Manga text language: ${MANGA_LANGUAGES[mangaLanguage].name}. Click to switch.`);
+    }
+
+    // Scripts written before language tracking were all generated in English
+    function scriptNeedsTranslation(bp, lang) {
+      return !!bp.script && (bp.scriptLang || 'en') !== lang;
+    }
+
+    btnMangaLang.addEventListener('click', () => {
+      setMangaLanguage(mangaLanguage === 'en' ? 'fr' : 'en');
+      triggerAutoSave();
+      const langName = MANGA_LANGUAGES[mangaLanguage].name;
+      const stale = getPageBreakdownData().filter(bp => scriptNeedsTranslation(bp, mangaLanguage)).length;
+      showToast(stale
+        ? `Manga text: ${langName}. ${stale} panel script(s) are in another language. Click ✍️ Write Panel Scripts to rewrite them in ${langName}.`
+        : `Manga text: ${langName}`);
+    });
+
+    // =========================================================================
+    // --- LOCALSTORAGE PERSISTENCE (SAVE EVERYTHING) ---
+    // =========================================================================
+
+    function saveAllToLocalStorage() {
+      try {
+        const total = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+        const currentRatio = document.getElementById('aspectRatioSelect')?.value || '3:4';
+        const state = {
+          apiKey: document.getElementById('apiKeyInput').value,
+          projectSlug: currentProjectSlug,
+          projectTitle: document.getElementById('projectTitleInput').value,
+          masterPrompt: document.getElementById('masterPrompt').value,
+          characters: document.getElementById('charactersInput').value,
+          pageCount: total,
+          emotionalImpact: document.getElementById('emotionalImpact').value,
+          genreStyle: document.getElementById('genreStyleSelect')?.value || 'whimsical_fantasy',
+          aspectRatio: currentRatio,
+          language: mangaLanguage,
+          actTitle1: document.getElementById('actTitle1')?.value || "Movement I",
+          actText1: document.getElementById('actText1')?.value || "",
+          actTitle2: document.getElementById('actTitle2')?.value || "Movement II",
+          actText2: document.getElementById('actText2')?.value || "",
+          actTitle3: document.getElementById('actTitle3')?.value || "Movement III",
+          actText3: document.getElementById('actText3')?.value || "",
+          actTitle4: document.getElementById('actTitle4')?.value || "Movement IV",
+          actText4: document.getElementById('actText4')?.value || "",
+          actTitle5: document.getElementById('actTitle5')?.value || "Movement V",
+          actText5: document.getElementById('actText5')?.value || "",
+          spoilerMask: document.getElementById('spoilerToggle').checked,
+          pagesBlueprint: getPageBreakdownData(),
+          updatedAt: new Date().toLocaleTimeString()
+        };
+
+        // Project-specific storage to prevent cross-contamination
+        localStorage.setItem('MANGA_STUDIO_PROJECT_' + currentProjectSlug, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem('MANGA_STUDIO_ACTIVE_SLUG', currentProjectSlug);
+
+        // Sync to server project.json
+        if (currentProjectSlug && currentProjectSlug !== 'new') {
+          fetch('/api/save_project_state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: currentProjectSlug,
+              title: state.projectTitle,
+              genre: state.genreStyle,
+              aspect_ratio: state.aspectRatio,
+              language: state.language,
+              concept: state.masterPrompt,
+              characters: state.characters,
+              page_count: state.pageCount,
+              emotional_impact: state.emotionalImpact,
+              acts: [
+                { title: state.actTitle1, text: state.actText1 },
+                { title: state.actTitle2, text: state.actText2 },
+                { title: state.actTitle3, text: state.actText3 },
+                { title: state.actTitle4, text: state.actText4 },
+                { title: state.actTitle5, text: state.actText5 }
+              ],
+              pages_blueprint: state.pagesBlueprint
+            })
+          }).catch(() => {});
+        }
+
+        const badge = document.getElementById('autosaveText');
+        if (badge) {
+          badge.textContent = "Saved " + state.updatedAt;
+        }
+      } catch (e) {
+        console.warn("LocalStorage save error:", e);
+      }
+    }
+
+    let autoSaveTimer = null;
+    function triggerAutoSave() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(saveAllToLocalStorage, 350);
+    }
+
+    // Auto-save on ANY user input across the application
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      mainEl.addEventListener('input', triggerAutoSave);
+      mainEl.addEventListener('change', triggerAutoSave);
+    }
+
+    function loadAllFromLocalStorage(targetSlug) {
+      try {
+        const slug = targetSlug || localStorage.getItem('MANGA_STUDIO_ACTIVE_SLUG') || currentProjectSlug;
+        let raw = localStorage.getItem('MANGA_STUDIO_PROJECT_' + slug);
+        if (!raw) raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const state = JSON.parse(raw);
+
+        if (state.apiKey) {
+          document.getElementById('apiKeyInput').value = state.apiKey;
+          updateKeyStatus(state.apiKey);
+        }
+        if (state.projectTitle) document.getElementById('projectTitleInput').value = state.projectTitle;
+        if (state.masterPrompt) document.getElementById('masterPrompt').value = state.masterPrompt;
+        if (state.characters) document.getElementById('charactersInput').value = state.characters;
+        if (state.pageCount) {
+          document.getElementById('pageCountInput').value = state.pageCount;
+          updatePageRanges(state.pageCount);
+        }
+        if (state.genreStyle && document.getElementById('genreStyleSelect')) document.getElementById('genreStyleSelect').value = state.genreStyle;
+        if (state.aspectRatio) {
+          updateAspectRatio(state.aspectRatio);
+        }
+        setMangaLanguage(state.language || 'en');
+        
+        if (state.actTitle1 && document.getElementById('actTitle1')) document.getElementById('actTitle1').value = state.actTitle1;
+        if (state.actText1 && document.getElementById('actText1')) document.getElementById('actText1').value = state.actText1;
+        else if (state.act1 && document.getElementById('actText1')) document.getElementById('actText1').value = state.act1;
+
+        if (state.actTitle2 && document.getElementById('actTitle2')) document.getElementById('actTitle2').value = state.actTitle2;
+        if (state.actText2 && document.getElementById('actText2')) document.getElementById('actText2').value = state.actText2;
+        else if (state.act2 && document.getElementById('actText2')) document.getElementById('actText2').value = state.act2;
+
+        if (state.actTitle3 && document.getElementById('actTitle3')) document.getElementById('actTitle3').value = state.actTitle3;
+        if (state.actText3 && document.getElementById('actText3')) document.getElementById('actText3').value = state.actText3;
+        else if (state.act3 && document.getElementById('actText3')) document.getElementById('actText3').value = state.act3;
+
+        if (state.actTitle4 && document.getElementById('actTitle4')) document.getElementById('actTitle4').value = state.actTitle4;
+        if (state.actText4 && document.getElementById('actText4')) document.getElementById('actText4').value = state.actText4;
+        else if (state.act4 && document.getElementById('actText4')) document.getElementById('actText4').value = state.act4;
+
+        if (state.actTitle5 && document.getElementById('actTitle5')) document.getElementById('actTitle5').value = state.actTitle5;
+        if (state.actText5 && document.getElementById('actText5')) document.getElementById('actText5').value = state.actText5;
+        else if (state.act5 && document.getElementById('actText5')) document.getElementById('actText5').value = state.act5;
+
+        if (state.spoilerMask !== undefined) {
+          document.getElementById('spoilerToggle').checked = state.spoilerMask;
+          for (let i = 2; i <= 5; i++) {
+            const card = document.getElementById('actCard' + i);
+            if (card) card.classList.toggle('spoiler-blurred', state.spoilerMask);
+          }
+        }
+
+        if (state.pagesBlueprint && state.pagesBlueprint.length > 0) {
+          renderPageBreakdownUI(state.pagesBlueprint);
+        } else if (slug === 'grimoire') {
+          renderPageBreakdownUI(GRIMOIRE_50_PAGES);
+        }
+
+        const badge = document.getElementById('autosaveText');
+        if (badge && state.updatedAt) {
+          badge.textContent = "Restored (" + state.updatedAt + ")";
+        }
+        return true;
+      } catch (e) {
+        console.warn("Could not load from LocalStorage:", e);
+        return false;
+      }
+    }
+
+
+    // --- Project Management & Server Integration ---
+    let currentProjectSlug = 'grimoire';
+    let currentProjectTitle = 'Grimoire';
+    const projectSelect = document.getElementById('projectSelect');
+    const projectTitleInput = document.getElementById('projectTitleInput');
+    const projectFolderDisplay = document.getElementById('projectFolderDisplay');
+    const projRefsCount = document.getElementById('projRefsCount');
+    const projPagesCount = document.getElementById('projPagesCount');
+    const btnCreateProject = document.getElementById('btnCreateProject');
+    const btnRefreshProjects = document.getElementById('btnRefreshProjects');
+    const liveGallery = document.getElementById('liveGallery');
+
+    async function loadProjectsList() {
+      try {
+        const resp = await fetch('/api/projects');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const projects = data.projects || [];
+        
+        projectSelect.innerHTML = '';
+        const newOpt = document.createElement('option');
+        newOpt.value = 'new';
+        newOpt.textContent = '+ [Create New Manga Project]';
+        projectSelect.appendChild(newOpt);
+
+        projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = `${p.title} (${p.reference_count} refs, ${p.page_count} pgs)`;
+          if (p.id === currentProjectSlug) opt.selected = true;
+          projectSelect.appendChild(opt);
+        });
+
+        // Ensure current selection is reflected
+        if (currentProjectSlug === 'grimoire') {
+          const grimOpt = Array.from(projectSelect.options).find(o => o.value === 'grimoire');
+          if (grimOpt) grimOpt.selected = true;
+        }
+      } catch (e) {
+        console.warn("Could not fetch projects list:", e);
+      }
+    }
+
+    async function switchProject(slug) {
+      if (slug === 'new') {
+        currentProjectSlug = 'new';
+        currentProjectTitle = '';
+        projectTitleInput.value = '';
+        projectFolderDisplay.textContent = 'projects/<new_manga>/ (Pending creation)';
+        projRefsCount.textContent = '0';
+        projPagesCount.textContent = '0';
+        liveGallery.innerHTML = '<div style="color: var(--text-muted); padding: 2rem; grid-column: 1/-1; text-align: center; border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm);">📁 Ready for New Manga. Enter your concept, generate reference sheets, and pages will be created inside your dedicated project folder.</div>';
+        showToast("Started New Manga Project. Enter a title & concept!");
+        return;
+      }
+
+      try {
+        // Save current project state before switching
+        saveAllToLocalStorage();
+
+        const resp = await fetch(`/api/project_info?project=${slug}`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        currentProjectSlug = data.id;
+        currentProjectTitle = data.title;
+        projectTitleInput.value = data.title;
+        projectFolderDisplay.textContent = data.folder || '/ (Root Grimoire)';
+        projRefsCount.textContent = data.references ? data.references.length : 0;
+        projPagesCount.textContent = data.pages ? data.pages.length : 0;
+
+        // If project metadata exists, load concept, characters, acts, and blueprints
+        if (data.meta) {
+          if (data.meta.concept) document.getElementById('masterPrompt').value = data.meta.concept;
+          if (data.meta.characters) document.getElementById('charactersInput').value = data.meta.characters;
+          if (data.meta.page_count) {
+            document.getElementById('pageCountInput').value = data.meta.page_count;
+            updatePageRanges(data.meta.page_count);
+          }
+          if (data.meta.emotional_impact) {
+            const empEl = document.getElementById('emotionalImpact');
+            if (empEl) empEl.value = data.meta.emotional_impact;
+          }
+          // Projects saved before ratio tracking were generated at the server default (3:4)
+          updateAspectRatio(data.meta.aspect_ratio || '3:4');
+          setMangaLanguage(data.meta.language || 'en');
+
+          // Populate Acts & Titles
+          if (data.meta.acts && Array.isArray(data.meta.acts)) {
+            data.meta.acts.forEach((act, idx) => {
+              const num = idx + 1;
+              const titleEl = document.getElementById('actTitle' + num);
+              const textEl = document.getElementById('actText' + num);
+              if (titleEl && act.title) titleEl.value = act.title;
+              if (textEl && act.text) textEl.value = act.text;
+            });
+          }
+
+          // Populate Page Breakdown Blueprint
+          if (data.meta.pages_blueprint && Array.isArray(data.meta.pages_blueprint) && data.meta.pages_blueprint.length > 0) {
+            renderPageBreakdownUI(data.meta.pages_blueprint);
+          } else if (slug === 'grimoire') {
+            renderPageBreakdownUI(GRIMOIRE_50_PAGES);
+          } else {
+            const total = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+            const proc = generateProceduralBreakdown(total, data.meta.concept || '');
+            renderPageBreakdownUI(proc);
+          }
+        }
+
+        // Auto-update start page input based on existing pages
+        const startInput = document.getElementById('genStartPageInput');
+        const pageCount = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+        const pgsLen = data.pages ? data.pages.length : 0;
+        if (startInput) {
+          startInput.value = (pgsLen > 0 && pgsLen < pageCount) ? (pgsLen + 1) : 1;
+        }
+
+        // Adapt style & genre based on project
+        const genreSel = document.getElementById('genreStyleSelect');
+        if (genreSel) {
+          if (slug === 'grimoire') {
+            genreSel.value = 'dark_fantasy';
+          } else if (data.meta && data.meta.genre) {
+            genreSel.value = data.meta.genre;
+          } else if (slug.includes('mimijokie')) {
+            genreSel.value = 'whimsical_fantasy';
+          } else {
+            genreSel.value = 'custom';
+          }
+        }
+
+        if (slug === 'grimoire') {
+          styleFilename.textContent = 'style.png (Kentaro Miura Berserk Ink)';
+          stylePreviewImg.src = 'style.png';
+        } else {
+          if (!activeCustomStyleBase64) {
+            const genreName = genreSel ? genreSel.selectedOptions[0]?.textContent.split('(')[0].trim() : 'Whimsical Fantasy';
+            styleFilename.textContent = 'Genre Preset: ' + genreName;
+            if (data.references && data.references.length > 0) {
+              stylePreviewImg.src = data.references[0] + '?t=' + Date.now();
+            } else {
+              stylePreviewImg.src = 'projects/mimijokie/references/mimijokie_reference_sheet.jpg';
+            }
+          }
+        }
+
+        renderProjectGallery(data);
+        saveAllToLocalStorage();
+        showToast(`Switched to Manga Project: ${data.title}`);
+      } catch (e) {
+        console.error("Error loading project info:", e);
+      }
+    }
+
+    function renderProjectGallery(projectData) {
+      liveGallery.innerHTML = '';
+      const refs = projectData.references || [];
+      const pages = projectData.pages || [];
+
+      if (refs.length === 0 && pages.length === 0) {
+        liveGallery.innerHTML = `<div style="color: var(--text-muted); padding: 2rem; grid-column: 1/-1; text-align: center; border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm);">No visual assets generated yet in <code>${projectData.folder || 'projects/' + projectData.id}</code>.<br>Click "Generate Reference Sheets" below!</div>`;
+        return;
+      }
+
+      // Add character reference sheets first
+      refs.forEach(refPath => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        const cleanName = refPath.split('/').pop().replace('_reference_sheet.jpg', '').replace('.jpg', '').replace('_', ' ').toUpperCase();
+        item.innerHTML = `
+          <img src="${refPath}?t=${Date.now()}" alt="${cleanName}" onerror="this.parentElement.style.display='none'">
+          <div class="gallery-item-badge" style="background: rgba(114, 185, 213, 0.9);">Ref: ${cleanName}</div>
+        `;
+        item.addEventListener('click', () => {
+          window.open(refPath, '_blank');
+        });
+        liveGallery.appendChild(item);
+      });
+
+      // Add comic pages
+      pages.forEach((pgPath, idx) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        const pageNum = idx + 1;
+        item.innerHTML = `
+          <img src="${pgPath}?t=${Date.now()}" alt="Page ${pageNum}" onerror="this.parentElement.style.display='none'">
+          <div class="gallery-item-badge">P.${pageNum}</div>
+        `;
+        item.addEventListener('click', () => {
+          window.open(`reader.html?project=${projectData.id}`, '_blank');
+        });
+        liveGallery.appendChild(item);
+      });
+    }
+
+    async function ensureProjectCreated() {
+      const title = projectTitleInput.value.trim() || "Untitled Manga";
+      let slug = currentProjectSlug;
+
+      if (slug === 'new' || slug === 'grimoire' && title.toLowerCase() !== 'grimoire') {
+        slug = title.toLowerCase().replace(/[^a-z0-9_\-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+        if (!slug) slug = `manga_${Date.now()}`;
+
+        const acts = [];
+        for (let i = 1; i <= 5; i++) {
+          const tEl = document.querySelector(`#actCard${i} .act-title-tag span`);
+          const rEl = document.querySelector(`#actCard${i} .act-pages-range`);
+          const textEl = document.getElementById(`actText${i}`);
+          acts.push({
+            title: tEl ? tEl.textContent : `Movement ${i}`,
+            range: rEl ? rEl.textContent : '',
+            text: textEl ? textEl.value : ''
+          });
+        }
+
+        const payload = {
+          title: title,
+          slug: slug,
+          genre: document.getElementById('genreStyleSelect')?.value || 'whimsical_fantasy',
+          aspect_ratio: document.getElementById('aspectRatioSelect')?.value || '3:4',
+          language: mangaLanguage,
+          concept: document.getElementById('masterPrompt').value.trim(),
+          characters: document.getElementById('charactersInput').value.trim(),
+          page_count: parseInt(document.getElementById('pageCountInput').value, 10) || 50,
+          emotional_impact: document.getElementById('emotionalImpact').value,
+          acts: acts
+        };
+
+        const res = await fetch('/api/create_project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const resData = await res.json();
+          currentProjectSlug = resData.project.id;
+          currentProjectTitle = resData.project.title;
+          projectFolderDisplay.textContent = resData.project.folder;
+          await loadProjectsList();
+          projectSelect.value = currentProjectSlug;
+          showToast(`📁 Created dedicated project folder: ${resData.project.folder}/`);
+        }
+      }
+      return currentProjectSlug;
+    }
+
+    projectSelect.addEventListener('change', (e) => {
+      switchProject(e.target.value);
+    });
+
+    btnRefreshProjects.addEventListener('click', () => {
+      loadProjectsList();
+      showToast("Projects refreshed from server.");
+    });
+
+    btnCreateProject.addEventListener('click', async () => {
+      await ensureProjectCreated();
+      showToast(`Project folder initialized: projects/${currentProjectSlug}/`);
+    });
+
+    // Initialize projects and restore from LocalStorage on load
+    loadProjectsList().then(() => {
+      const restored = loadAllFromLocalStorage();
+      if (!restored) {
+        switchProject('grimoire');
+        renderPageBreakdownUI(GRIMOIRE_50_PAGES);
+      }
+    });
+
+    // --- Generation Studio Buttons ---
+    const pipelineBox = document.getElementById('pipelineBox');
+    const pipelineStatusLabel = document.getElementById('pipelineStatusLabel');
+    const pipelinePercent = document.getElementById('pipelinePercent');
+    const pipelineBar = document.getElementById('pipelineBar');
+
+    // GENERATE REFERENCE SHEETS (Iterates character cast & writes directly to projects/<slug>/references/)
+    document.getElementById('btnGenRefs').addEventListener('click', async () => {
+      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      const charsRaw = document.getElementById('charactersInput').value.trim();
+
+      if (!apiKey) {
+        showToast("Please enter your Google API Key at the top.");
+        return;
+      }
+      if (!charsRaw) {
+        showToast("Please define at least one character in the Character Cast box.");
+        return;
+      }
+
+      pipelineBox.style.display = 'flex';
+      pipelineStatusLabel.textContent = "Initializing project folder and subdirectories...";
+      pipelinePercent.textContent = "5%";
+      pipelineBar.style.width = "5%";
+
+      try {
+        // Ensure dedicated project folder exists
+        const slug = await ensureProjectCreated();
+
+        // Parse individual characters
+        const charLines = charsRaw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const characters = charLines.map(line => {
+          const match = line.match(/^([^(\-]+)(?:[(-](.+)[)]?)?$/);
+          if (match) {
+            return {
+              name: match[1].trim(),
+              desc: (match[2] || "").trim()
+            };
+          }
+          return { name: line.slice(0, 20), desc: line };
+        });
+
+        const total = characters.length;
+        let completed = 0;
+
+        showToast(`Generating ${total} character reference sheets into projects/${slug}/references/...`);
+
+        for (const char of characters) {
+          pipelineStatusLabel.textContent = `[${completed + 1}/${total}] Inking reference sheet for ${char.name} with Nano Banana 2 Lite...`;
+          pipelinePercent.textContent = `${Math.round(((completed) / total) * 90) + 10}%`;
+          pipelineBar.style.width = `${Math.round(((completed) / total) * 90) + 10}%`;
+
+          const res = await fetch('/api/generate_reference', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project: slug,
+              character_name: char.name,
+              description: char.desc,
+              api_key: apiKey,
+              style_image: activeCustomStyleBase64 || "style.png",
+              aspect_ratio: getSelectedAspectRatio(),
+              language: mangaLanguage
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(errData.error || `HTTP ${res.status}`);
+          }
+
+          const refResult = await res.json();
+          completed++;
+
+          // Prepend new reference sheet to gallery
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          item.innerHTML = `
+            <img src="${refResult.url}?t=${Date.now()}" alt="${char.name}">
+            <div class="gallery-item-badge" style="background: rgba(114, 185, 213, 0.9);">Ref: ${char.name}</div>
+          `;
+          item.addEventListener('click', () => window.open(refResult.url, '_blank'));
+          liveGallery.prepend(item);
+
+          showToast(`Reference sheet created: ${char.name}`);
+        }
+
+        pipelinePercent.textContent = "100%";
+        pipelineBar.style.width = "100%";
+        pipelineStatusLabel.textContent = `Generated ${completed} reference sheet(s) in projects/${slug}/references/`;
+        projRefsCount.textContent = completed;
+        showToast(`All ${completed} reference sheets saved in projects/${slug}/references/!`);
+
+      } catch (e) {
+        console.error(e);
+        showToast(`Error: ${e.message}`);
+        pipelineStatusLabel.textContent = `Reference generation error: ${e.message}`;
+        pipelineBar.style.width = "100%";
+      }
+    });
+
+    // =========================================================================
+    // --- SEQUENTIAL PAGE GENERATOR (Iterates All Pages In Order Until End) ---
+    // =========================================================================
+    let isGeneratingPages = false;
+    const btnGenManga = document.getElementById('btnGenManga');
+
+    function updateGalleryWithPage(pageResult, slug, pageNum) {
+      // Remove placeholder message if present
+      const emptyNotice = liveGallery.querySelector('div[style*="border: 1px dashed"]');
+      if (emptyNotice) emptyNotice.remove();
+
+      let existing = liveGallery.querySelector(`.gallery-item[data-page="${pageNum}"]`);
+      if (existing) {
+        const img = existing.querySelector('img');
+        if (img) img.src = `${pageResult.url}?t=${Date.now()}`;
+      } else {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.setAttribute('data-page', pageNum);
+        item.innerHTML = `
+          <img src="${pageResult.url}?t=${Date.now()}" alt="Page ${pageNum}">
+          <div class="gallery-item-badge">P.${pageNum}</div>
+        `;
+        item.addEventListener('click', () => window.open(`reader.html?project=${slug}`, '_blank'));
+
+        // Insert in numerical order among page items
+        const allPageItems = Array.from(liveGallery.querySelectorAll('.gallery-item[data-page]'));
+        const nextItem = allPageItems.find(el => parseInt(el.getAttribute('data-page'), 10) > pageNum);
+        if (nextItem) {
+          liveGallery.insertBefore(item, nextItem);
+        } else {
+          liveGallery.appendChild(item);
+        }
+      }
+    }
+
+    btnGenManga.addEventListener('click', async () => {
+      // If already generating, act as a Stop / Pause toggle
+      if (isGeneratingPages) {
+        isGeneratingPages = false;
+        btnGenManga.innerHTML = `<span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span> Stopping after current page...`;
+        showToast("Halting sequential inking after current page finishes...");
+        return;
+      }
+
+      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      const chars = document.getElementById('charactersInput').value.trim();
+      const totalPages = parseInt(document.getElementById('pageCountInput').value, 10) || 50;
+      const title = document.getElementById('projectTitleInput').value.trim() || currentProjectTitle || "Dark Fantasy Manga";
+      const emotionalImpact = getEmotionalImpactLabel();
+      const startInput = document.getElementById('genStartPageInput');
+      // Locked for the whole run so every page in the batch shares one format and language
+      const aspectRatio = getSelectedAspectRatio();
+      const pageLayout = ASPECT_RATIO_LAYOUTS[aspectRatio];
+      const language = mangaLanguage;
+      const languageName = MANGA_LANGUAGES[language].name;
+
+      if (!apiKey) {
+        showToast("Please enter your Google API Key at the top.");
+        return;
+      }
+
+      pipelineBox.style.display = 'flex';
+      pipelineStatusLabel.textContent = "Initializing sequential novella production pipeline...";
+      pipelinePercent.textContent = "5%";
+      pipelineBar.style.width = "5%";
+
+      const originalBtnHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Generate All Pages in Order (<span id="btnPageCountNum">${totalPages}</span> Pages)`;
+
+      try {
+        const slug = await ensureProjectCreated();
+
+        // Determine starting page: check existing pages or user input
+        let startPage = 1;
+        if (startInput && parseInt(startInput.value, 10)) {
+          startPage = Math.max(1, parseInt(startInput.value, 10));
+        } else {
+          try {
+            const infoResp = await fetch(`/api/project_info?project=${slug}`);
+            if (infoResp.ok) {
+              const info = await infoResp.json();
+              const existingCount = info.pages ? info.pages.length : 0;
+              if (existingCount > 0 && existingCount < totalPages) {
+                startPage = existingCount + 1;
+              }
+            }
+          } catch (e) {
+            console.warn("Could not query existing page count:", e);
+          }
+        }
+
+        if (startPage > totalPages) {
+          startPage = 1;
+        }
+        if (startInput) startInput.value = startPage;
+
+        // Retrieve latest blueprint data
+        let blueprints = getPageBreakdownData();
+        if (!blueprints || blueprints.length === 0) {
+          blueprints = generateProceduralBreakdown(totalPages, document.getElementById('masterPrompt').value);
+        }
+
+        const actTexts = [
+          document.getElementById('actText1')?.value || "",
+          document.getElementById('actText2')?.value || "",
+          document.getElementById('actText3')?.value || "",
+          document.getElementById('actText4')?.value || "",
+          document.getElementById('actText5')?.value || ""
+        ];
+        const step = Math.ceil(totalPages / 5);
+
+        // Enter sequential generation state
+        isGeneratingPages = true;
+        aspectRatioSelect.disabled = true;
+        studioAspectRatioSelect.disabled = true;
+        btnMangaLang.disabled = true;
+        btnGenManga.style.background = 'linear-gradient(135deg, #c44545, #7a1e1e)';
+        const runPages = blueprints.slice(startPage - 1, totalPages);
+        const unscripted = runPages.filter(bp => !bp.script).length;
+        const otherLanguage = runPages.filter(bp => scriptNeedsTranslation(bp, language)).length;
+        showToast(unscripted
+          ? `⚠️ ${unscripted} page(s) have no panel script, so their dialogue will be improvised. Click ✍️ Write Panel Scripts first for a coherent story.`
+          : otherLanguage
+            ? `⚠️ ${otherLanguage} panel script(s) are in another language and will be translated into ${languageName} while inking. Click ✍️ Write Panel Scripts for native ${languageName} dialogue.`
+            : `Starting sequential generation: Pages ${startPage} to ${totalPages} at ${aspectRatio}, ${languageName} text...`);
+
+        for (let pg = startPage; pg <= totalPages; pg++) {
+          if (!isGeneratingPages) {
+            pipelineStatusLabel.textContent = `⏸️ Sequential generation paused at Page ${pg - 1} of ${totalPages}. Click button to resume.`;
+            showToast(`Paused at Page ${pg - 1}. Click button to resume.`);
+            break;
+          }
+
+          if (startInput) startInput.value = pg;
+
+          // Update Stop button label
+          btnGenManga.innerHTML = `<span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span> ⏹️ Stop Generation (Inking Page ${pg}/${totalPages})`;
+
+          // Progress percentage
+          const pct = Math.round(((pg - 1) / totalPages) * 100);
+          pipelinePercent.textContent = `${pct}%`;
+          pipelineBar.style.width = `${pct}%`;
+
+          // Page Blueprint specs
+          const bp = (blueprints && blueprints[pg - 1]) ? blueprints[pg - 1] : {};
+          const prevBp = (blueprints && blueprints[pg - 2]) ? blueprints[pg - 2] : null;
+          const actIdx = Math.min(4, Math.floor((pg - 1) / Math.max(1, step)));
+          const sceneTitle = bp.title || `Page ${pg}`;
+          const sceneNature = bp.nature || actTexts[actIdx].slice(0, 140) || `Sequential comic scene for page ${pg}`;
+          const sceneImpact = bp.impact || emotionalImpact || "Dark atmospheric tension";
+
+          pipelineStatusLabel.textContent = `[${pg}/${totalPages}] Inking: "${sceneTitle}" (${sceneNature.slice(0, 50)}...)...`;
+
+          const stylePrompt = getActiveStyleDescriptor();
+          const script = bp.script || '';
+          const promptText = buildPagePrompt({
+            bookTitle: title,
+            page: pg,
+            total: totalPages,
+            sceneTitle,
+            sceneNature,
+            script,
+            language: languageName,
+            translateScript: scriptNeedsTranslation(bp, language),
+            previousEnding: prevBp ? (getLastPanel(prevBp.script) || prevBp.nature || '') : '',
+            characters: getCharactersForPage(chars, `${sceneTitle} ${sceneNature} ${script}`),
+            mood: sceneImpact,
+            style: stylePrompt,
+            layout: pageLayout
+          });
+
+          const res = await fetch('/api/generate_page', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project: slug,
+              page_num: pg,
+              prompt: promptText,
+              style_prompt: getActiveStyleDescriptor(),
+              api_key: apiKey,
+              aspect_ratio: aspectRatio,
+              language,
+              attach_previous_page: pg > 1
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(`Page ${pg} failed: ${errData.error || res.status}`);
+          }
+
+          const pageResult = await res.json();
+
+          // Update Gallery & Badge
+          updateGalleryWithPage(pageResult, slug, pg);
+          projPagesCount.textContent = pg;
+
+          const donePct = Math.round((pg / totalPages) * 100);
+          pipelinePercent.textContent = `${donePct}%`;
+          pipelineBar.style.width = `${donePct}%`;
+          pipelineStatusLabel.textContent = `[${pg}/${totalPages}] Inked "${sceneTitle}" -> saved to projects/${slug}/pages/${pageResult.filename}`;
+          showToast(`Inked Page ${pg}/${totalPages}: ${sceneTitle}`);
+          if (startInput) startInput.value = Math.min(totalPages, pg + 1);
+        }
+
+        if (isGeneratingPages) {
+          // Completed all pages in order!
+          pipelinePercent.textContent = "100%";
+          pipelineBar.style.width = "100%";
+          pipelineStatusLabel.innerHTML = `🎉 <b>Complete!</b> Inked all ${totalPages} pages in <code>projects/${slug}/pages/</code>. <a href="reader.html?project=${slug}" target="_blank" style="color: var(--gold-light); text-decoration: underline; font-weight: bold; margin-left: 0.5rem;">📖 Open Reader</a>`;
+          showToast(`🎉 Complete! All ${totalPages} pages generated in order.`);
+          if (startInput) startInput.value = 1;
+        }
+
+      } catch (e) {
+        console.error("Sequential generation error:", e);
+        showToast(`Error: ${e.message}`);
+        pipelineStatusLabel.textContent = `Inking halted: ${e.message}`;
+        pipelineBar.style.width = "100%";
+      } finally {
+        isGeneratingPages = false;
+        aspectRatioSelect.disabled = false;
+        studioAspectRatioSelect.disabled = false;
+        btnMangaLang.disabled = false;
+        btnGenManga.style.background = '';
+        btnGenManga.innerHTML = originalBtnHTML;
+      }
+    });
+
+  </script>
+</body>
+</html>

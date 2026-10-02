@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRIMOIRE — Dark Fantasy Manga Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07080a;
+      --bg-card: rgba(14, 16, 21, 0.85);
+      --bg-surface: #12151c;
+      --border-subtle: rgba(180, 160, 120, 0.15);
+      --border-accent: rgba(212, 175, 55, 0.4);
+      --gold-primary: #d4af37;
+      --gold-light: #f3e5ab;
+      --starlight-blue: #72b9d5;
+      --text-main: #e2e4e9;
+      --text-muted: #8b92a0;
+      --glow-gold: 0 0 25px rgba(212, 175, 55, 0.25);
+      --glow-blue: 0 0 25px rgba(114, 185, 213, 0.25);
+      --font-title: 'Cinzel', serif;
+      --font-body: 'Cormorant Garamond', Georgia, serif;
+      --font-ui: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(30, 42, 56, 0.35) 0%, transparent 60%),
+        radial-gradient(circle at 20% 90%, rgba(20, 15, 10, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 90%, rgba(10, 25, 35, 0.3) 0%, transparent 50%);
+    }
+
+    /* Ambient noise overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.85) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Top Navigation Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(7, 8, 10, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 50;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    header.autohide {
+      transform: translateY(-100%);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .brand-title {
+      font-family: var(--font-title);
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--gold-primary);
+      text-shadow: var(--glow-gold);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .brand-title span {
+      font-size: 0.75rem;
+      font-family: var(--font-ui);
+      letter-spacing: 0.15em;
+      color: var(--starlight-blue);
+      border: 1px solid rgba(114, 185, 213, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .current-chapter-info {
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      font-style: italic;
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 1.25rem;
+      display: none;
+    }
+
+    @media (min-width: 860px) {
+      .current-chapter-info {
+        display: block;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      height: 38px;
+      padding: 0 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-icon:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--border-accent);
+      color: var(--gold-light);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
+    }
+
+    .btn-icon.active {
+      background: rgba(114, 185, 213, 0.15);
+      border-color: var(--starlight-blue);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(114, 185, 213, 0.2);
+    }
+
+    /* Main Viewport Container */
+    main {
+      flex: 1;
+      padding-top: 64px;
+      padding-bottom: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+
+    /* Single / Double Page Display */
+    .viewport {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 138px);
+      width: 100%;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .manga-spread {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 100%;
+      position: relative;
+    }
+
+    .manga-page-card {
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 1px rgba(212, 175, 55, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: zoom-in;
+    }
+
+    .manga-page-card:hover {
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(114, 185, 213, 0.15);
+    }
+
+    .manga-page-card img {
+      display: block;
+      height: calc(100vh - 170px);
+      max-height: 1020px;
+      width: auto;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Webtoon / Continuous Vertical Mode */
+    .vertical-strip-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 860px;
+      padding: 2rem 1rem;
+      margin: 0 auto;
+    }
+
+    .vertical-strip-container .manga-page-card img {
+      width: 100%;
+      height: auto;
+      max-height: none;
+    }
+
+    /* Click Zones for Navigation */
+    .click-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 30%;
+      z-index: 10;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .click-zone:hover {
+      opacity: 1;
+    }
+
+    .click-zone-left {
+      left: 0;
+      justify-content: flex-start;
+      padding-left: 1.5rem;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+    }
+
+    .click-zone-right {
+      right: 0;
+      justify-content: flex-end;
+      padding-right: 1.5rem;
+      background: linear-gradient(-90deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+    }
+
+    .nav-hint-arrow {
+      background: rgba(14, 16, 21, 0.85);
+      border: 1px solid var(--border-accent);
+      color: var(--gold-light);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    /* Bottom Scrubber & Control Bar */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(7, 8, 10, 0.88);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 50;
+      transition: transform 0.3s ease;
+    }
+
+    footer.autohide {
+      transform: translateY(100%);
+    }
+
+    .page-scrubber {
+      flex: 1;
+      max-width: 540px;
+      margin: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slider-track {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #1c202a;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .slider-track::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+      transition: transform 0.15s ease;
+    }
+
+    .slider-track::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .page-counter-badge {
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      min-width: 86px;
+      text-align: center;
+    }
+
+    /* Modal / Drawer Styles */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      z-index: 101;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -10px 0 50px rgba(0,0,0,0.8);
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      color: var(--gold-light);
+      letter-spacing: 0.15em;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+    .btn-close:hover {
+      color: #fff;
+    }
+
+    .drawer-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    /* Thumbnail Grid inside Drawer */
+    .thumbnail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+    }
+
+    .thumbnail-item {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      background: #000;
+      transition: all 0.2s ease;
+      aspect-ratio: 9/16;
+    }
+
+    .thumbnail-item:hover, .thumbnail-item.active {
+      border-color: var(--gold-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .thumbnail-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumbnail-badge {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: var(--gold-light);
+      font-size: 0.75rem;
+      font-family: var(--font-title);
+      padding: 4px;
+      text-align: center;
+    }
+
+    /* Reference Sheets Codex Grid */
+    .codex-card {
+      background: rgba(14, 16, 21, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .codex-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .codex-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .codex-info {
+      padding: 1rem 1.25rem;
+    }
+
+    .codex-name {
+      font-family: var(--font-title);
+      color: var(--gold-primary);
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .codex-desc {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Ambient Audio Pulse Indicator */
+    .sound-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--starlight-blue);
+      margin-right: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .sound-pulse.playing {
+      box-shadow: 0 0 10px var(--starlight-blue);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    /* Fullscreen Modal View for Image */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+
+    .lightbox-modal.open {
+      display: flex;
+    }
+
+    .lightbox-modal img {
+      max-width: 95vw;
+      max-height: 95vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 0 50px rgba(0,0,0,0.9);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(18, 21, 28, 0.95);
+      border: 1px solid var(--border-accent);
+      color: var(--gold-light);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-family: var(--font-ui);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+      box-shadow: var(--glow-gold);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  
+    /* Zoom Level Widget */
+    .zoom-widget {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(18, 22, 32, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 1px;
+      height: 36px;
+      transition: all 0.2s ease;
+    }
+
+    .zoom-widget:hover {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.18);
+    }
+
+    .zoom-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .zoom-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--gold-light);
+    }
+
+    .zoom-btn:active {
+      transform: scale(0.9);
+    }
+
+    .zoom-level-badge {
+      background: transparent;
+      border: none;
+      color: var(--gold-light);
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0 4px;
+      cursor: pointer;
+      min-width: 42px;
+      text-align: center;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+
+    .zoom-level-badge:hover {
+      color: #fff;
+      text-shadow: 0 0 8px var(--gold-primary);
+    }
+
+    .zoom-fit-btn {
+      border-left: 1px solid var(--border-subtle);
+      border-radius: 0 4px 4px 0;
+      margin-left: 1px;
+    }
+
+    .viewport.zoomed {
+      overflow: auto !important;
+      cursor: grab;
+    }
+    .viewport.zoomed:active {
+      cursor: grabbing;
+    }
+    .manga-spread {
+      transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+      transform-origin: center top;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="mainHeader">
+    <div class="brand-section">
+      <a href="#" class="brand-title">
+        <span id="brandTitleText">GRIMOIRE</span> <span id="brandSubText">50-PAGE DARK FANTASY</span>
+      </a>
+      <div class="current-chapter-info" id="chapterInfo">
+        Movement I: The Vigil — Page 1
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Project Switcher -->
+      <select id="readerProjectSwitcher" style="background: rgba(18,21,28,0.95); border: 1px solid var(--border-subtle); color: var(--gold-light); padding: 5px 8px; border-radius: 6px; font-size: 0.8rem; outline: none; cursor: pointer;">
+        <option value="grimoire">Grimoire (50 Pages)</option>
+      </select>
+
+      <a href="MangaCreator.html" class="btn-icon" title="Open Manga Creator Studio" style="text-decoration: none; color: var(--gold-light); display: inline-flex; align-items: center; gap: 4px;">
+        ⚡ Studio
+      </a>
+      <!-- Ambient Subterranean Drone -->
+      <button class="btn-icon" id="btnAudio" title="Toggle Subterranean Ambient Sound">
+        <span class="sound-pulse" id="audioPulse"></span>
+        <span id="audioLabel">Abyss Hum</span>
+      </button>
+
+      <!-- Reading Mode Switcher -->
+      <button class="btn-icon" id="btnModeSingle" title="Single Page Flip">Single</button>
+      <button class="btn-icon" id="btnModeDouble" title="Double Page Spread">Spread</button>
+      <button class="btn-icon" id="btnModeStrip" title="Continuous Webtoon Scroll">Strip</button>
+
+      <!-- Zoom Level Widget -->
+      <div class="zoom-widget" id="zoomWidget">
+        <button class="zoom-btn" id="btnZoomOut" title="Zoom Out (-)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="zoom-level-badge" id="btnZoomReset" title="Click to Toggle Zoom (100% / 150%)">
+          <span id="zoomLabel">100%</span>
+        </button>
+        <button class="zoom-btn" id="btnZoomIn" title="Zoom In (+)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="zoom-btn zoom-fit-btn" id="btnZoomFit" title="Fit to Screen (0)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+        </button>
+      </div>
+
+
+      <!-- Reference Codex -->
+      <button class="btn-icon" id="btnCodex" title="Character & World Reference Codex">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        Codex
+      </button>
+
+      <!-- Thumbnails Drawer Button -->
+      <button class="btn-icon" id="btnThumbnails" title="Open Page Navigator">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Pages
+      </button>
+
+      <!-- Fullscreen -->
+      <button class="btn-icon" id="btnFullscreen" title="Toggle Fullscreen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Manga Viewport -->
+  <main id="mainViewport">
+    <!-- Paged Spread Mode Container -->
+    <div class="viewport" id="pagedContainer">
+      <div class="click-zone click-zone-left" id="clickPrev" title="Previous Page (Left Arrow)">
+        <div class="nav-hint-arrow">&#8592;</div>
+      </div>
+
+      <div class="manga-spread" id="mangaSpread">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <div class="click-zone click-zone-right" id="clickNext" title="Next Page (Right Arrow)">
+        <div class="nav-hint-arrow">&#8594;</div>
+      </div>
+    </div>
+
+    <!-- Continuous Strip Mode Container -->
+    <div class="vertical-strip-container" id="verticalStripContainer">
+      <!-- Injected via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Bottom Control Bar -->
+  <footer id="mainFooter">
+    <button class="btn-icon" id="btnPrevPage">
+      &#8592; Prev
+    </button>
+
+    <div class="page-scrubber">
+      <input type="range" min="1" max="12" value="1" class="slider-track" id="pageSlider">
+      <div class="page-counter-badge" id="pageCounter">01 / 12</div>
+    </div>
+
+    <button class="btn-icon" id="btnNextPage">
+      Next &#8594;
+    </button>
+  </footer>
+
+  <!-- Thumbnails Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="thumbnailsDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">PAGES NAVIGATOR</div>
+      <button class="btn-close" id="btnCloseThumbnails">&times;</button>
+    </div>
+    <div class="drawer-content">
+      <div class="thumbnail-grid" id="thumbnailGrid">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Codex Reference Drawer -->
+  <div class="drawer" id="codexDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">VISUAL CODEX</div>
+      <button class="btn-close" id="btnCloseCodex">&times;</button>
+    </div>
+    <div class="drawer-content" id="codexList">
+      <!-- Dynamically populated -->
+    </div>
+  </div>
+
+  <!-- Lightbox Zoom Modal -->
+  <div class="lightbox-modal" id="lightboxModal">
+    <img id="lightboxImg" src="" alt="Zoomed view">
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // --- Data Configuration ---
+    const CACHE_BUST = "?v=english_" + Date.now();
+    let PAGES = [
+      { num: 1, title: "The Silence of the Depths", act: "Movement I: The Vigil", file: "pages/page_01.jpg" + CACHE_BUST },
+      { num: 2, title: "The Obsidian Altar", act: "Movement I: The Vigil", file: "pages/page_02.jpg" + CACHE_BUST },
+      { num: 3, title: "The Ink of Names", act: "Movement I: The Vigil", file: "pages/page_03.jpg" + CACHE_BUST },
+      { num: 4, title: "The Cenotaph Hall", act: "Movement I: The Vigil", file: "pages/page_04.jpg" + CACHE_BUST },
+      { num: 5, title: "The Disturbance", act: "Movement I: The Vigil", file: "pages/page_05.jpg" + CACHE_BUST },
+      { num: 6, title: "The Fissure Above", act: "Movement I: The Vigil", file: "pages/page_06.jpg" + CACHE_BUST },
+      { num: 7, title: "The Stray Awakens", act: "Movement I: The Vigil", file: "pages/page_07.jpg" + CACHE_BUST },
+      { num: 8, title: "Tomb of Echoes", act: "Movement I: The Vigil", file: "pages/page_08.jpg" + CACHE_BUST },
+      { num: 9, title: "The Shadow Looming", act: "Movement I: The Vigil", file: "pages/page_09.jpg" + CACHE_BUST },
+      { num: 10, title: "You Are Leaking Warmth", act: "Movement I: The Vigil", file: "pages/page_10.jpg" + CACHE_BUST },
+      { num: 11, title: "The Imperial Shroud", act: "Movement II: The Anatomy of Memory", file: "pages/page_11.jpg" + CACHE_BUST },
+      { num: 12, title: "The Starlit Kindling", act: "Movement II: The Anatomy of Memory", file: "pages/page_12.jpg" + CACHE_BUST },
+      { num: 13, title: "The Question of Bone", act: "Movement II: The Anatomy of Memory", file: "pages/page_13.jpg" + CACHE_BUST },
+      { num: 14, title: "The Arrival of The Echo", act: "Movement II: The Anatomy of Memory", file: "pages/page_14.jpg" + CACHE_BUST },
+      { num: 15, title: "The Remnant of Ash", act: "Movement II: The Anatomy of Memory", file: "pages/page_15.jpg" + CACHE_BUST },
+      { num: 16, title: "The Meaning of Death", act: "Movement II: The Anatomy of Memory", file: "pages/page_16.jpg" + CACHE_BUST },
+      { num: 17, title: "The River of Souls", act: "Movement II: The Anatomy of Memory", file: "pages/page_17.jpg" + CACHE_BUST },
+      { num: 18, title: "The Fisher of Souls", act: "Movement II: The Anatomy of Memory", file: "pages/page_18.jpg" + CACHE_BUST },
+      { num: 19, title: "The Carving of Names", act: "Movement II: The Anatomy of Memory", file: "pages/page_19.jpg" + CACHE_BUST },
+      { num: 20, title: "Sanctuary in the Stone", act: "Movement II: The Anatomy of Memory", file: "pages/page_20.jpg" + CACHE_BUST },
+      { num: 21, title: "The Sky Shatters", act: "Movement III: The Solar Iron", file: "pages/page_21.jpg" + CACHE_BUST },
+      { num: 22, title: "The Descending Sun", act: "Movement III: The Solar Iron", file: "pages/page_22.jpg" + CACHE_BUST },
+      { num: 23, title: "The Holy Threat", act: "Movement III: The Solar Iron", file: "pages/page_23.jpg" + CACHE_BUST },
+      { num: 24, title: "Holy Vandalism", act: "Movement III: The Solar Iron", file: "pages/page_24.jpg" + CACHE_BUST },
+      { num: 25, title: "The Desecration", act: "Movement III: The Solar Iron", file: "pages/page_25.jpg" + CACHE_BUST },
+      { num: 26, title: "The Unforgiving Eye", act: "Movement III: The Solar Iron", file: "pages/page_26.jpg" + CACHE_BUST },
+      { num: 27, title: "The Falling Edge", act: "Movement III: The Solar Iron", file: "pages/page_27.jpg" + CACHE_BUST },
+      { num: 28, title: "The Intercession", act: "Movement III: The Solar Iron", file: "pages/page_28.jpg" + CACHE_BUST },
+      { num: 29, title: "The Bite of Steel", act: "Movement III: The Solar Iron", file: "pages/page_29.jpg" + CACHE_BUST },
+      { num: 30, title: "Ash and Light", act: "Movement III: The Solar Iron", file: "pages/page_30.jpg" + CACHE_BUST },
+      { num: 31, title: "The Book Awakens", act: "Movement IV: The Unearthing", file: "pages/page_31.jpg" + CACHE_BUST },
+      { num: 32, title: "The Blazing Name", act: "Movement IV: The Unearthing", file: "pages/page_32.jpg" + CACHE_BUST },
+      { num: 33, title: "The Ancestor in the Bone", act: "Movement IV: The Unearthing", file: "pages/page_33.jpg" + CACHE_BUST },
+      { num: 34, title: "The Slain Martyr", act: "Movement IV: The Unearthing", file: "pages/page_34.jpg" + CACHE_BUST },
+      { num: 35, title: "The Cracking of Dogma", act: "Movement IV: The Unearthing", file: "pages/page_35.jpg" + CACHE_BUST },
+      { num: 36, title: "The First Page", act: "Movement IV: The Unearthing", file: "pages/page_36.jpg" + CACHE_BUST },
+      { num: 37, title: "The Scribe's Vow", act: "Movement IV: The Unearthing", file: "pages/page_37.jpg" + CACHE_BUST },
+      { num: 38, title: "The Living Witness", act: "Movement IV: The Unearthing", file: "pages/page_38.jpg" + CACHE_BUST },
+      { num: 39, title: "The Fall of the Sword", act: "Movement IV: The Unearthing", file: "pages/page_39.jpg" + CACHE_BUST },
+      { num: 40, title: "Silence After Dogma", act: "Movement IV: The Unearthing", file: "pages/page_40.jpg" + CACHE_BUST },
+      { num: 41, title: "The Unmasked Old Man", act: "Movement V: The Open Page", file: "pages/page_41.jpg" + CACHE_BUST },
+      { num: 42, title: "The Shield at the Breach", act: "Movement V: The Open Page", file: "pages/page_42.jpg" + CACHE_BUST },
+      { num: 43, title: "The Hidden Way", act: "Movement V: The Open Page", file: "pages/page_43.jpg" + CACHE_BUST },
+      { num: 44, title: "The Subterranean Ascent", act: "Movement V: The Open Page", file: "pages/page_44.jpg" + CACHE_BUST },
+      { num: 45, title: "The Soul Blossom", act: "Movement V: The Open Page", file: "pages/page_45.jpg" + CACHE_BUST },
+      { num: 46, title: "The Father's Touch", act: "Movement V: The Open Page", file: "pages/page_46.jpg" + CACHE_BUST },
+      { num: 47, title: "The Green Horizon", act: "Movement V: The Open Page", file: "pages/page_47.jpg" + CACHE_BUST },
+      { num: 48, title: "The Eternal Sentry", act: "Movement V: The Open Page", file: "pages/page_48.jpg" + CACHE_BUST },
+      { num: 49, title: "The Return to Vigil", act: "Movement V: The Open Page", file: "pages/page_49.jpg" + CACHE_BUST },
+      { num: 50, title: "Epilogue: The Inscription", act: "Movement V: The Open Page", file: "pages/page_50.jpg" + CACHE_BUST }
+    ];
+
+    let CODEX_ITEMS = [
+      {
+        name: "Malacor the Sorrowful",
+        desc: "An ancient necromancer Lich crowned in thorns. Not a devourer of life, but the world's solitary keeper of forgotten dead.",
+        file: "references/lich_reference_sheet.jpg"
+      },
+      {
+        name: "The Grimoire of the Undying",
+        desc: "A massive tome bound in blackened leather with a vertebrae spine. Inscribed in ash with names the living burnt away.",
+        file: "references/grimoire_reference_sheet.jpg"
+      },
+      {
+        name: "The Depths Untold",
+        desc: "A subterranean megastructure of titan ribcage bridges, drowned Gothic spires, and silent black water.",
+        file: "references/depths_untold_reference_sheet.jpg"
+      },
+      {
+        name: "Elara (The Mortal Stray)",
+        desc: "A 9-year-old child who fell from the burning world above, bearing soot, scraped knees, and a dying lantern.",
+        file: "references/mortal_stray_reference_sheet.jpg"
+      },
+      {
+        name: "The Echo (Unfinished Soul)",
+        desc: "The gentle phantom of Malacor's daughter, woven of celestial starlight and trailing soul mist.",
+        file: "references/echo_reference_sheet.jpg"
+      },
+      {
+        name: "Inquisitor Knight Hesketh",
+        desc: "An 8ft dogmatic zealot encased in radiant-eye plate armor, wielding a colossal chained executioner's greatsword.",
+        file: "references/zealot_reference_sheet.jpg"
+      },
+      {
+        name: "Cast Scale Lineup",
+        desc: "Relative heights and silhouettes from fragile mortality (3'3\") to ancient monumentality (8'0\").",
+        file: "references/cast_lineup_reference_sheet.jpg"
+      }
+    ];
+
+    // --- State Variables ---
+    let currentPageIndex = 0; // 0-based index
+    let currentMode = 'single'; // 'single' | 'double' | 'strip'
+
+    // --- DOM Elements ---
+    const pagedContainer = document.getElementById('pagedContainer');
+    const verticalStripContainer = document.getElementById('verticalStripContainer');
+    const mangaSpread = document.getElementById('mangaSpread');
+    const chapterInfo = document.getElementById('chapterInfo');
+    const pageSlider = document.getElementById('pageSlider');
+    const pageCounter = document.getElementById('pageCounter');
+    const btnPrevPage = document.getElementById('btnPrevPage');
+    const btnNextPage = document.getElementById('btnNextPage');
+    const btnModeSingle = document.getElementById('btnModeSingle');
+    const btnModeDouble = document.getElementById('btnModeDouble');
+    const btnModeStrip = document.getElementById('btnModeStrip');
+    const btnThumbnails = document.getElementById('btnThumbnails');
+    const btnCodex = document.getElementById('btnCodex');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const thumbnailsDrawer = document.getElementById('thumbnailsDrawer');
+    const codexDrawer = document.getElementById('codexDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const btnCloseThumbnails = document.getElementById('btnCloseThumbnails');
+    const btnCloseCodex = document.getElementById('btnCloseCodex');
+    const thumbnailGrid = document.getElementById('thumbnailGrid');
+    const codexList = document.getElementById('codexList');
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const toast = document.getElementById('toast');
+
+    // --- Toast Notification ---
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // --- Render Viewport ---
+    function render() {
+      // Update UI active buttons
+      btnModeSingle.classList.toggle('active', currentMode === 'single');
+      btnModeDouble.classList.toggle('active', currentMode === 'double');
+      btnModeStrip.classList.toggle('active', currentMode === 'strip');
+
+      if (!PAGES || PAGES.length === 0) {
+        chapterInfo.textContent = "No pages inked yet";
+        pageSlider.value = 1;
+        pageSlider.max = 1;
+        pageCounter.textContent = "00 / 00";
+        pagedContainer.style.display = 'flex';
+        verticalStripContainer.style.display = 'none';
+        mangaSpread.innerHTML = `
+          <div style="text-align: center; padding: 4rem 2rem; max-width: 620px; margin: 3rem auto; background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: 12px;">
+            <div style="font-size: 3.5rem; margin-bottom: 1rem;">✨📖</div>
+            <h2 style="font-family: var(--font-title); color: var(--gold-primary); margin-bottom: 0.75rem; font-size: 1.6rem;">No Inked Pages Yet</h2>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; font-size: 0.95rem;">This manga project has not generated any inked pages yet. Switch back to MangaCreator Studio to ink your novella!</p>
+            <a href="MangaCreator.html" style="background: linear-gradient(135deg, var(--gold-primary), #8c6f1a); color: #000; padding: 0.85rem 1.8rem; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block;">Open MangaCreator Studio</a>
+          </div>
+        `;
+        return;
+      }
+
+      const page = PAGES[currentPageIndex] || PAGES[0];
+      chapterInfo.textContent = `${page.act} — Page ${page.num}: ${page.title}`;
+      pageSlider.value = currentPageIndex + 1;
+      pageCounter.textContent = `${String(page.num).padStart(2, '0')} / ${String(PAGES.length).padStart(2, '0')}`;
+
+      // Update Slider Max
+      pageSlider.max = PAGES.length;
+
+      if (currentMode === 'strip') {
+        pagedContainer.style.display = 'none';
+        verticalStripContainer.style.display = 'flex';
+        renderVerticalStrip();
+      } else {
+        pagedContainer.style.display = 'flex';
+        verticalStripContainer.style.display = 'none';
+        renderPagedSpread();
+      }
+
+      updateThumbnailsActive();
+    }
+
+    function renderPagedSpread() {
+      mangaSpread.innerHTML = '';
+
+      if (currentMode === 'single') {
+        const page = PAGES[currentPageIndex];
+        const card = createPageCard(page);
+        mangaSpread.appendChild(card);
+      } else if (currentMode === 'double') {
+        // Japanese manga spread layout: Right page is earlier, Left page is next
+        const first = PAGES[currentPageIndex];
+        const second = PAGES[currentPageIndex + 1];
+
+        if (second) {
+          mangaSpread.appendChild(createPageCard(second)); // Left
+        }
+        mangaSpread.appendChild(createPageCard(first)); // Right
+      }
+    }
+
+    function createPageCard(page) {
+      const card = document.createElement('div');
+      card.className = 'manga-page-card';
+      const img = document.createElement('img');
+      img.src = page.file;
+      img.alt = `Page ${page.num} - ${page.title}`;
+      img.loading = 'eager';
+
+      card.appendChild(img);
+      card.addEventListener('click', () => openLightbox(page.file));
+      return card;
+    }
+
+    function renderVerticalStrip() {
+      if (verticalStripContainer.children.length === 0) {
+        PAGES.forEach(page => {
+          const card = createPageCard(page);
+          card.id = `strip-page-${page.num}`;
+          verticalStripContainer.appendChild(card);
+        });
+      }
+      // Scroll to current page
+      const target = document.getElementById(`strip-page-${currentPageIndex + 1}`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // --- Navigation Logic ---
+    function nextPage() {
+      const step = currentMode === 'double' ? 2 : 1;
+      if (currentPageIndex + step < PAGES.length) {
+        currentPageIndex += step;
+        render();
+      } else {
+        showToast("End of available pages (Movement I & II)");
+      }
+    }
+
+    function prevPage() {
+      const step = currentMode === 'double' ? 2 : 1;
+      if (currentPageIndex - step >= 0) {
+        currentPageIndex -= step;
+        render();
+      } else if (currentPageIndex > 0) {
+        currentPageIndex = 0;
+        render();
+      }
+    }
+
+    function goToPage(idx) {
+      if (idx >= 0 && idx < PAGES.length) {
+        currentPageIndex = idx;
+        render();
+      }
+    }
+
+    // --- Event Listeners ---
+    document.getElementById('clickNext').addEventListener('click', nextPage);
+    document.getElementById('clickPrev').addEventListener('click', prevPage);
+    btnNextPage.addEventListener('click', nextPage);
+    btnPrevPage.addEventListener('click', prevPage);
+
+    pageSlider.addEventListener('input', (e) => {
+      goToPage(parseInt(e.target.value, 10) - 1);
+    });
+
+    btnModeSingle.addEventListener('click', () => { currentMode = 'single'; render(); showToast("Single Page Mode"); });
+    btnModeDouble.addEventListener('click', () => { currentMode = 'double'; render(); showToast("Double Page Spread"); });
+    btnModeStrip.addEventListener('click', () => { currentMode = 'strip'; render(); showToast("Continuous Strip Mode"); });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault();
+        nextPage();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevPage();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Escape') {
+        closeDrawers();
+        closeLightbox();
+      }
+    });
+
+    // --- Thumbnails Grid Initialization ---
+    function initThumbnails() {
+      thumbnailGrid.innerHTML = '';
+      PAGES.forEach((page, idx) => {
+        const item = document.createElement('div');
+        item.className = 'thumbnail-item';
+        item.id = `thumb-${idx}`;
+        item.innerHTML = `
+          <img src="${page.file}" alt="Page ${page.num}" loading="lazy">
+          <div class="thumbnail-badge">P.${page.num}</div>
+        `;
+        item.addEventListener('click', () => {
+          goToPage(idx);
+          closeDrawers();
+        });
+        thumbnailGrid.appendChild(item);
+      });
+    }
+
+    function updateThumbnailsActive() {
+      PAGES.forEach((_, idx) => {
+        const el = document.getElementById(`thumb-${idx}`);
+        if (el) {
+          el.classList.toggle('active', idx === currentPageIndex);
+        }
+      });
+    }
+
+    // --- Codex Initialization ---
+    function initCodex() {
+      codexList.innerHTML = '';
+      CODEX_ITEMS.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'codex-card';
+        card.innerHTML = `
+          <img src="${item.file}" alt="${item.name}" loading="lazy">
+          <div class="codex-info">
+            <div class="codex-name">${item.name}</div>
+            <div class="codex-desc">${item.desc}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => openLightbox(item.file));
+        codexList.appendChild(card);
+      });
+    }
+
+    // --- Drawers Management ---
+    function openDrawer(drawer) {
+      drawerOverlay.classList.add('open');
+      drawer.classList.add('open');
+    }
+
+    function closeDrawers() {
+      drawerOverlay.classList.remove('open');
+      thumbnailsDrawer.classList.remove('open');
+      codexDrawer.classList.remove('open');
+    }
+
+    btnThumbnails.addEventListener('click', () => openDrawer(thumbnailsDrawer));
+    btnCodex.addEventListener('click', () => openDrawer(codexDrawer));
+    drawerOverlay.addEventListener('click', closeDrawers);
+    btnCloseThumbnails.addEventListener('click', closeDrawers);
+    btnCloseCodex.addEventListener('click', closeDrawers);
+
+    // --- Lightbox Modal ---
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightboxModal.classList.add('open');
+    }
+
+    function closeLightbox() {
+      lightboxModal.classList.remove('open');
+    }
+
+    lightboxModal.addEventListener('click', closeLightbox);
+
+    // --- Fullscreen Toggle ---
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        showToast("Fullscreen Active (ESC to exit)");
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // --- Ambient Subterranean Drone (Web Audio API Synthesizer) ---
+    let audioCtx = null;
+    let isPlayingAudio = false;
+    let droneOsc1, droneOsc2, filter, gainNode;
+
+    const btnAudio = document.getElementById('btnAudio');
+    const audioPulse = document.getElementById('audioPulse');
+    const audioLabel = document.getElementById('audioLabel');
+
+    btnAudio.addEventListener('click', () => {
+      if (!isPlayingAudio) {
+        startAtmosphericAudio();
+      } else {
+        stopAtmosphericAudio();
+      }
+    });
+
+    function startAtmosphericAudio() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        // Deep subterranean harmonic drone
+        droneOsc1 = audioCtx.createOscillator();
+        droneOsc2 = audioCtx.createOscillator();
+        droneOsc1.type = 'sine';
+        droneOsc2.type = 'triangle';
+        droneOsc1.frequency.setValueAtTime(55, audioCtx.currentTime); // Low A
+        droneOsc2.frequency.setValueAtTime(55.4, audioCtx.currentTime); // Gentle binaural beating
+
+        filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(140, audioCtx.currentTime);
+
+        gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 3);
+
+        droneOsc1.connect(filter);
+        droneOsc2.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        droneOsc1.start();
+        droneOsc2.start();
+
+        isPlayingAudio = true;
+        audioPulse.classList.add('playing');
+        audioLabel.textContent = "Abyss Active";
+        showToast("Atmospheric Hum Engaged");
+      } catch (e) {
+        console.error("Web Audio not supported", e);
+      }
+    }
+
+    function stopAtmosphericAudio() {
+      if (gainNode && audioCtx) {
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+        setTimeout(() => {
+          if (audioCtx) audioCtx.close();
+          isPlayingAudio = false;
+          audioPulse.classList.remove('playing');
+          audioLabel.textContent = "Abyss Hum";
+          showToast("Audio Muted");
+        }, 1000);
+      }
+    }
+
+    // --- Auto-Hide Header & Footer on Inactivity in Paged Mode ---
+    let inactivityTimer;
+    function resetInactivity() {
+      document.getElementById('mainHeader').classList.remove('autohide');
+      document.getElementById('mainFooter').classList.remove('autohide');
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        if (!thumbnailsDrawer.classList.contains('open') && !codexDrawer.classList.contains('open')) {
+          document.getElementById('mainHeader').classList.add('autohide');
+          document.getElementById('mainFooter').classList.add('autohide');
+        }
+      }, 4500);
+    }
+    window.addEventListener('mousemove', resetInactivity);
+    window.addEventListener('touchstart', resetInactivity);
+
+    // --- Multi-Project Initialization ---
+    async function initProjectData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeProject = urlParams.get('project') || 'grimoire';
+
+      // Load project switcher options from server
+      try {
+        const resp = await fetch('/api/projects');
+        if (resp.ok) {
+          const pData = await resp.json();
+          const switcher = document.getElementById('readerProjectSwitcher');
+          if (switcher) {
+            switcher.innerHTML = '';
+            (pData.projects || []).forEach(p => {
+              const opt = document.createElement('option');
+              opt.value = p.id;
+              opt.textContent = `${p.title} (${p.page_count}p)`;
+              if (p.id === activeProject) opt.selected = true;
+              switcher.appendChild(opt);
+            });
+            switcher.addEventListener('change', (e) => {
+              window.location.href = `reader.html?project=${e.target.value}`;
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load projects list:", e);
+      }
+
+      // If viewing a custom project, load its pages & reference codex
+      if (activeProject !== 'grimoire') {
+        try {
+          const resp = await fetch(`/api/project_info?project=${activeProject}`);
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.title) {
+              document.title = `${data.title} — Manga Reader`;
+              document.getElementById('brandTitleText').textContent = data.title.toUpperCase();
+              document.getElementById('brandSubText').textContent = `${(data.pages || []).length}-PAGE MANGA`;
+            }
+            if (data.pages && data.pages.length > 0) {
+              PAGES = data.pages.map((pgUrl, idx) => ({
+                num: idx + 1,
+                title: `Page ${idx + 1}`,
+                act: `Act ${Math.ceil((idx + 1) / Math.max(1, Math.ceil(data.pages.length / 5)))}`,
+                file: pgUrl + "?v=" + Date.now()
+              }));
+              pageSlider.max = PAGES.length;
+            } else {
+              PAGES = [];
+              pageSlider.max = 1;
+              showToast(`Project '${data.title}' has no pages inked yet. Open studio to generate!`);
+            }
+
+            if (data.references && data.references.length > 0) {
+              CODEX_ITEMS = data.references.map(rfUrl => {
+                const name = rfUrl.split('/').pop().replace('_reference_sheet.jpg', '').replace('.jpg', '').replace('_', ' ').toUpperCase();
+                return {
+                  name: name,
+                  desc: `Concept Reference Sheet from ${data.title}`,
+                  file: rfUrl
+                };
+              });
+            } else {
+              CODEX_ITEMS = [];
+            }
+          }
+        } catch (e) {
+          console.error("Error loading project info in reader:", e);
+        }
+      } else {
+        document.title = "GRIMOIRE — Dark Fantasy Manga Reader";
+      }
+
+      initThumbnails();
+      initCodex();
+      render();
+    }
+
+    initProjectData();
+  
+    // --- Zoom Level Widget Logic ---
+    let currentZoom = 1.0;
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnZoomReset = document.getElementById('btnZoomReset');
+    const btnZoomFit = document.getElementById('btnZoomFit');
+    const zoomLabel = document.getElementById('zoomLabel');
+
+    function applyZoom(zoom, notify = false) {
+      currentZoom = Math.min(3.0, Math.max(0.5, Math.round(zoom * 100) / 100));
+      if (zoomLabel) zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+
+      if (currentMode === 'strip') {
+        const stripContainer = document.getElementById('verticalStripContainer');
+        if (stripContainer) {
+          stripContainer.style.maxWidth = `${Math.round(880 * currentZoom)}px`;
+          stripContainer.style.width = '100%';
+        }
+      } else {
+        const spreadEl = document.getElementById('mangaSpread');
+        const pContainer = document.getElementById('pagedContainer');
+        if (spreadEl) {
+          spreadEl.style.transform = currentZoom === 1.0 ? 'none' : `scale(${currentZoom})`;
+          spreadEl.style.transformOrigin = 'center top';
+        }
+        if (pContainer) {
+          if (currentZoom > 1.0) {
+            pContainer.classList.add('zoomed');
+            pContainer.style.overflow = 'auto';
+            pContainer.style.alignItems = 'flex-start';
+          } else {
+            pContainer.classList.remove('zoomed');
+            pContainer.style.overflow = 'hidden';
+            pContainer.style.alignItems = 'center';
+            pContainer.scrollTop = 0;
+            pContainer.scrollLeft = 0;
+          }
+        }
+      }
+      if (notify && typeof showToast === 'function') {
+        showToast(`Zoom: ${Math.round(currentZoom * 100)}%`);
+      }
+    }
+
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => applyZoom(currentZoom + 0.15, true));
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => applyZoom(currentZoom - 0.15, true));
+    if (btnZoomReset) btnZoomReset.addEventListener('click', () => applyZoom(currentZoom === 1.0 ? 1.5 : 1.0, true));
+    if (btnZoomFit) btnZoomFit.addEventListener('click', () => {
+      applyZoom(1.0);
+      if (typeof showToast === 'function') showToast("Zoom reset to 100% Fit");
+    });
+
+    // Ctrl + MouseWheel to Zoom
+    window.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.1 : -0.1;
+        applyZoom(currentZoom + delta);
+      }
+    }, { passive: false });
+
+    // Drag-to-Pan when zoomed in
+    let isPanning = false;
+    let startPanX = 0, startPanY = 0;
+    let scrollLeftStart = 0, scrollTopStart = 0;
+    const pContainerEl = document.getElementById('pagedContainer');
+
+    if (pContainerEl) {
+      pContainerEl.addEventListener('mousedown', (e) => {
+        if (currentZoom > 1.0 && e.button === 0) {
+          isPanning = true;
+          pContainerEl.style.cursor = 'grabbing';
+          startPanX = e.clientX;
+          startPanY = e.clientY;
+          scrollLeftStart = pContainerEl.scrollLeft;
+          scrollTopStart = pContainerEl.scrollTop;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (isPanning && currentZoom > 1.0) {
+          e.preventDefault();
+          const dx = e.clientX - startPanX;
+          const dy = e.clientY - startPanY;
+          pContainerEl.scrollLeft = scrollLeftStart - dx;
+          pContainerEl.scrollTop = scrollTopStart - dy;
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isPanning) {
+          isPanning = false;
+          if (pContainerEl) pContainerEl.style.cursor = currentZoom > 1.0 ? 'grab' : 'default';
+        }
+      });
+    }
+
+    // Keyboard Zoom Shortcuts (+, -, 0)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === '+' || e.key === '=') {
+        applyZoom(currentZoom + 0.15, true);
+      } else if (e.key === '-' || e.key === '_') {
+        applyZoom(currentZoom - 0.15, true);
+      } else if (e.key === '0') {
+        applyZoom(1.0, true);
+      }
+    });
+
+  </script>
+</body>
+</html>
